@@ -102,7 +102,7 @@ class HandManager:
         
     def update_skill(self,frame, skill_item:Item, gesture, tracked_faces):
         self.current_skill = skill_item
-        if len(self.landmarks) > 0 :
+        if len(self.landmarks) > 0 and self.main_user.get_mp()>=10:
             if self.current_skill.get_name() == "gun" :
                 if gesture == "gun_pose":
         
@@ -126,6 +126,7 @@ class HandManager:
                         self.gun.update_direction(dir)
                 elif gesture == "fire" and self.gun_counter == 10 :
                         self.gun.update_status(EStatus.MOVING)
+                        self.main_user.update_mp(-10)
                         self.gun = None
                         self.gun_counter = -1
                 else:
@@ -145,6 +146,7 @@ class HandManager:
                     #         self.hand_counter = (self.hand_counter + 1) % 6
                     #         if users.get_hp() > 0:
                     #             users.update_hp(-skill_item.get_bonus_damage())
+                    self.main_user.update_mp(-0.1)
                     for tracked_face in tracked_faces:
                         # [tl,br,id,crop,seg_face,user]
                         face = tracked_face[4]
