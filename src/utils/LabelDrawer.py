@@ -641,3 +641,6 @@ class LabelDrawer:
         new_tl = (new_x_0,new_y_0)
         new_br = (new_x_1,new_y_1)
         return [new_tl,new_br,cut_image]
+    
+
+    

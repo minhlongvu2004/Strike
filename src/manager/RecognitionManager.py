@@ -35,10 +35,10 @@ class RecognitionManager:
     
         for i,(index,id) in enumerate(zip(best_class_idexs,ids)):
             probability = predictions[i][index] * 100
-            print(f"id {id}probability {probability}")
+  
             if(probability > con.RECOGNITION_THRESHOLD ):
                 user_name = self.label_encoder.inverse_transform([index])[0]
-                print(f"id:{id}")
+   
                 recognized_faces.append((int(id),user_name))
                 
         return recognized_faces
