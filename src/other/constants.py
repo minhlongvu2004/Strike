@@ -117,6 +117,7 @@ GUN_STEP = 10
 GUN_NAME = "gun"
 GUN_DAMAGE = 6
 GUN_IMAGE_LINK = "./assets/item/ball.png"
+GUN_EXPLODE_LINK = "./assets/item/explode.png"
 
 KATANA_NAME = "katana"
 KATANA_DAMAGE = 4
