@@ -100,9 +100,7 @@ class TrackerManager:
                     tracked_id.append(tracker_result)
                 else:
                     untracked_id.append(tracker_result)
-        id1 = [result[4] for result in tracked_id]
-        id2 = [result[4] for result in untracked_id]
-        print(f"track_id{id1} untrack_id{id2}")
+  
         return tracked_id, untracked_id
             
             

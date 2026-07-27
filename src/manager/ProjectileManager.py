@@ -64,7 +64,7 @@ class ProjectileManager:
         
                 tl,_,br,_ = pro.get_coordinates()
                 # in case it is outside of the frame
-                print(f"tl:{tl} br{br}")
+       
                 LabelDrawer.merge_tranparent_image(image,
                                     pro.get_image(),
                                     tl,

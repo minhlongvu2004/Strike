@@ -12,7 +12,9 @@ class User:
                  experience_point: int,
                  attack_damage : int, 
                  role : ERole,
-                 level: int):
+                 level: int,
+                 main_title= "",
+                 main_ultimate_skill= ""):
         self.name = name
         self.hp = health_point
         self.mp = mana_point
@@ -22,6 +24,19 @@ class User:
         self.level = level
         self.death_image = cv2.imread(con.DEATH_IMAGE,cv2.IMREAD_UNCHANGED)
         self.give_exp = False
+        self.main_title = main_title
+        self.main_ultimate_skill = main_ultimate_skill
+        
+    def update_give_exp(self, is_give):
+        self.give_exp = is_give
+    def is_give_exp(self):
+        return self.give_exp
+
+    def get_title(self):
+        return self.main_title
+    def get_ultimate_skill(self):
+        return self.main_ultimate_skill
+    
     def update_give_exp(self, is_give):
         self.give_exp = is_give
     def is_give_exp(self):
@@ -47,6 +62,8 @@ class User:
         return self.mp 
     def get_exp(self):
         return self.exp
+    def get_dmg(self):
+        return self.atk
     
     
     
@@ -60,10 +77,19 @@ class User:
         else:
             self.hp = updated_hp
     def update_mp(self,new_mp):
-        self.hp += new_mp
+        updated_mp = self.mp + new_mp
+        if updated_mp <= 0:
+            self.mp = 0
+        else:
+            self.mp=updated_mp
     def update_exp(self,new_exp):
-        self.hp += new_exp
+        updated_exp = self.exp + new_exp
+        if updated_exp >= 100:
+            self.exp = updated_exp - 100
+            self.level = self.level + 1
+        else:
+            self.exp += new_exp
     def update_atk(self,new_atk):
-        self.hp += new_atk
+        self.atk += new_atk
     def update_lvl(self, new_lvl):
-        self.hp += new_lvl
+        self.level += new_lvl

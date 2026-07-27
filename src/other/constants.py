@@ -141,7 +141,8 @@ LIST_ITEM__SIZE = (60, 60)
 TOP_LEFT_ITEMS_LIST = (320 - 120, 240 - 30)
 OPEN_LIST = True
 CLOSE_LIST = False
-
+OPEN_SYS = True
+CLOSE_SYS = False
 # ==========================================
 # 7. Visual Effects (Damage)
 # ==========================================
@@ -154,3 +155,12 @@ DAMAGE_COLORS_BGR = [
     (0, 0, 140),
     (0, 0, 80),
 ]
+# ==========================================
+# 8. System Status Icon (Damage)
+# ==========================================
+SYSTEM_ICON_TOP_LEFT = (390,15)
+SYSTEM_ICON_TOP_RIGHT = (460,15)
+SYSTEM_ICON_BOTTOM_RIGHT = (460,55)
+SYSTEM_ICON_BOTTOM_LEFT = (390,55)
+SYSTEM_ICON_PATH =  "./assets/item/system_status.png"
+
