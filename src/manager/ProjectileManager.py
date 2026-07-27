@@ -34,7 +34,7 @@ class ProjectileManager:
                         pro.update_colliding_face(face)
                         pro.update_colliding_user(user)
                         # self.collide = True
-                        pro.update_image("./Items/explode.png")
+                        pro.update_image(con.EXPLODE_PROJECTILE)
                 if pro.get_status() == EStatus.MOVING:
                     pro.fire(img_shape)
             elif pro.status == EStatus.DYING:
@@ -64,7 +64,7 @@ class ProjectileManager:
         
                 tl,_,br,_ = pro.get_coordinates()
                 # in case it is outside of the frame
-
+       
                 LabelDrawer.merge_tranparent_image(image,
                                     pro.get_image(),
                                     tl,

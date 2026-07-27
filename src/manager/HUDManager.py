@@ -5,8 +5,9 @@ import numpy as np
 
 from src.enum import EItem
 from src.entity import ItemList, Polygon, User
-from src.utils import SAT
+from src.utils import SAT, LabelDrawer
 from src.other import constants as con
+
 
 
 class HUDManager:
@@ -16,14 +17,36 @@ class HUDManager:
                  main_user: User,
                  hud_top_left,
                  items_list_top_left,
-                 open_item_list: bool):
+                 system_top_left,
+                 system_top_right,
+                 system_bottom_right,
+                 system_bottom_left,
+                 system_path,
+                 open_item_list: bool,
+                 open_system_status: bool):
         self.selected_eitem = selected_eitem
         self.item_list = item_list
         self.main_user = main_user
         self.hud_top_left = hud_top_left
         self.items_list_top_left = items_list_top_left
         self.open_item_list = open_item_list # True/False to open ItemList
+        self.system_tl = system_top_left
+        self.system_tr = system_top_right
+        self.system_br = system_bottom_right
+        self.system_bl = system_bottom_left
+        self.open_system_status = open_system_status
+        self.system_polygon = Polygon([self.system_tl,
+                                       self.system_tr,
+                                       self.system_br,
+                                       self.system_bl])
+        
+        self.system_path = system_path
+        self.sys_img = cv2.imread(self.system_path,cv2.IMREAD_UNCHANGED)
+        
         self.start_count = cv2.getTickCount()
+        
+        
+        
         
         # I'm honest that I cheat it a little bit by making the hitbox bigger
         x,y = hud_top_left
@@ -57,25 +80,48 @@ class HUDManager:
                 if SAT.check_collide(item_polygon,
                                     if_polygon):
                     self.selected_eitem = item
-                    
+    def get_system_icon_polygon(self):
+        return self.system_polygon   
     def check_if_click_item_hud(self,
                                  current_gesture,
                                  if_polygon:Polygon):
         img_polygon = self.get_image_hud_polygon()
+        sys_polygon = self.get_system_icon_polygon()
         
         if current_gesture == "click" and if_polygon is not None:
                     # item_position
             time = (cv2.getTickCount() - self.start_count) * 1000 / cv2.getTickFrequency() 
-            if SAT.check_collide(img_polygon,
+            if SAT.check_collide(sys_polygon,
+                                 if_polygon):
+                if time > 1500:
+                    # Usually an click span for 3-4 frames, so this is to avoid 
+                    # mis activate click again
+                    status = self.open_system_status
+                    self.start_count = cv2.getTickCount()
+    
+                    self.open_system_status = con.CLOSE_SYS \
+                                    if status == con.OPEN_SYS else con.OPEN_SYS 
+                    self.open_item_list = con.CLOSE_LIST 
+            
+            elif SAT.check_collide(img_polygon,
                                 if_polygon):
-                if time > 500:
+                if time > 1500:
                     # Usually an click span for 3-4 frames, so this is to avoid 
                     # mis activate click again
                     status = self.open_item_list
                     self.start_count = cv2.getTickCount()
                     self.open_item_list = con.CLOSE_LIST \
                         if status == con.OPEN_LIST else con.OPEN_LIST 
+                    self.open_system_status = con.CLOSE_SYS 
     
+    def draw_system_icon(self,frame):
+        print(self.system_tl)
+        print(self.system_br)
+        LabelDrawer.merge_tranparent_image(frame,
+                                        self.sys_img, 
+                                        self.system_tl,
+                                        self.system_br,
+                                        )
     
     def draw_mu_hud(self, frame):
         main_user = self.main_user
@@ -83,12 +129,16 @@ class HUDManager:
         
         rect_w =  con.MAIN_IMAGE_WIDTH + con.MAIN_HOR_BAR_LENGTH + 5 * con.ADDITIONAL_SIZE
         rect_h = con.MAIN_IMAGE_WIDTH + con.MAIN_HOR_BAR_THICK + 4 * con.ADDITIONAL_SIZE
+       
         roi = frame[hud_top_left[1]: hud_top_left[1] + rect_h,
                     hud_top_left[0] : hud_top_left[0] + rect_w]
         
         img_tl = (con.ADDITIONAL_SIZE, con.ADDITIONAL_SIZE)
         img_br = (img_tl[0] + con.MAIN_IMAGE_WIDTH, 
                 img_tl[1] + con.MAIN_IMAGE_HEIGHT)
+        
+        print(f"img tl:{(hud_top_left[0] + con.ADDITIONAL_SIZE, hud_top_left[1]+con.ADDITIONAL_SIZE)}\
+            br:{(hud_top_left[0] + img_br[0], hud_top_left[1] + img_br[1] )}")
         
         hp_p1 = (img_br[0] + 2 * con.ADDITIONAL_SIZE,
                 img_tl[1] + 2 * con.ADDITIONAL_SIZE)
@@ -212,4 +262,103 @@ class HUDManager:
                             con.TRANS_BETA,
                             con.TRANS_GAMMA,
                             roi)
-            roi[:,:] = (1-masks_image) * roi + masks_image * items_image 
+            roi[:,:] = (1-masks_image) * roi + masks_image * items_image
+            
+    def draw_system_status_hud(self,
+                           frame):
+        if self.open_system_status:
+            user = self.main_user
+            img_h,img_w,_ = frame.shape
+            header = "User Status"
+            size = 0.7
+            name = f"Name: {user.get_name()}"
+            title = f"Title: {user.get_title()}"
+            u_skill = f"Skill: {user.get_ultimate_skill()}"
+            lvl = f"Level: {user.get_level()}"
+            dmg = f"Damage: {user.get_dmg()}"
+            
+            # size = (height,width)
+            header_size,_ = cv2.getTextSize(header, cv2.FONT_HERSHEY_COMPLEX, size,2)
+            name_size,_ = cv2.getTextSize(name, cv2.FONT_HERSHEY_COMPLEX, size,1)
+            title_size,_ = cv2.getTextSize(title, cv2.FONT_HERSHEY_COMPLEX, size,1)
+            u_skill_size,_ = cv2.getTextSize(u_skill, cv2.FONT_HERSHEY_COMPLEX, size,1)
+            lvl_size,_ = cv2.getTextSize(lvl, cv2.FONT_HERSHEY_COMPLEX, size,1)
+            dmg_size,_ = cv2.getTextSize(dmg, cv2.FONT_HERSHEY_COMPLEX, size,1)
+    
+            max_height = max(header_size[1],
+                            name_size[1],
+                            title_size[1],
+                            u_skill_size[1],
+                            lvl_size[1],
+                            dmg_size[1])
+            max_width = max(name_size[0],
+                            title_size[0],
+                            u_skill_size[0],
+                            lvl_size[0],
+                            dmg_size[0])
+            rec_w = 2 * con.PADDING + max_width
+            rec_h = 4 * con.PADDING + header_size[1]\
+                + max_height * 5 + 5 * con.LINE_SPACE 
+            hud_w = rec_w + 2 * con.ADDITIONAL_SIZE
+            hud_h = rec_h + 2 * con.ADDITIONAL_SIZE
+            
+            
+            hud_tl = ((img_w - hud_w)//2,
+                    (img_h - hud_h)//2)
+            hud_br = (hud_tl[0] + hud_w,
+                    hud_tl[1] + hud_h)
+            
+            rec_tl = (con.ADDITIONAL_SIZE,
+                    con.ADDITIONAL_SIZE)
+            rec_br = (rec_tl[0] + rec_w,
+                    rec_tl[1] + rec_h)
+            roi = frame[hud_tl[1]:hud_br[1],
+                        hud_tl[0]:hud_br[0]]
+            
+            hd_br = (rec_tl[0] + (rec_w-header_size[0])//2,
+                    rec_tl[1] + con.PADDING + header_size[1])
+            nm_br = (rec_tl[0] + con.PADDING,
+                    hd_br[1] + con.LINE_SPACE + name_size[1])
+            tle_br = (nm_br[0],
+                    nm_br[1] + con.LINE_SPACE + title_size[1])
+            us_br = (nm_br[0],
+                    tle_br[1] + con.LINE_SPACE + u_skill_size[1])
+            lv_br = (nm_br[0],
+                    us_br[1] + con.LINE_SPACE + lvl_size[1])
+            dmg_br = (nm_br[0],
+                    lv_br[1] + con.LINE_SPACE + dmg_size[1])
+            # Transparent
+            overlay = roi.copy()
+            cv2.rectangle(roi,rec_tl,rec_br,con.BG_COLOR,-1)
+            cv2.addWeighted(overlay, 0.4, roi,0.6,0,roi)
+            
+            # Neon effect
+            mask_neon = np.zeros_like(roi, dtype=np.uint8)
+            
+            cv2.putText(mask_neon, header, hd_br, con.FONT_FACE, size, con.TEXT_OUTER_COLOR, 2)
+            cv2.putText(mask_neon, name, nm_br, con.FONT_FACE, size, con.TEXT_OUTER_COLOR, 1)
+            cv2.putText(mask_neon, title, tle_br, con.FONT_FACE, size, con.TEXT_OUTER_COLOR, 1)
+            cv2.putText(mask_neon, u_skill, us_br, con.FONT_FACE, size, con.TEXT_OUTER_COLOR, 1)
+            cv2.putText(mask_neon, lvl, lv_br, con.FONT_FACE, size, con.TEXT_OUTER_COLOR, 1)
+            cv2.putText(mask_neon, dmg, dmg_br, con.FONT_FACE, size, con.TEXT_OUTER_COLOR, 1)
+            
+            cv2.rectangle(mask_neon, rec_tl,rec_br,con.BD_OUTER_COLOR,1)
+            mask_neon = cv2.dilate(mask_neon,
+                                   con.DILATE_KERNEL,
+                                   iterations=con.DILATE_ITERATION)
+            mask_neon = cv2.GaussianBlur(mask_neon,con.BLUR_KERNEL, 0)  
+            cv2.addWeighted(mask_neon,
+                            con.DILATE_ALPHA, 
+                            roi, 
+                            con.DILATE_BETA,
+                            con.DILATE_GAMMA,
+                            roi)
+            
+            cv2.putText(roi, header, hd_br, con.FONT_FACE, size, con.TEXT_INNER_COLOR, 2)
+            cv2.putText(roi, name, nm_br, con.FONT_FACE, size, con.TEXT_INNER_COLOR, 1)
+            cv2.putText(roi, title, tle_br, con.FONT_FACE, size, con.TEXT_INNER_COLOR, 1)
+            cv2.putText(roi, u_skill, us_br, con.FONT_FACE, size, con.TEXT_INNER_COLOR, 1)
+            cv2.putText(roi, lvl, lv_br, con.FONT_FACE, size, con.TEXT_INNER_COLOR, 1)
+            cv2.putText(roi, dmg, dmg_br, con.FONT_FACE, size, con.TEXT_INNER_COLOR, 1)
+            cv2.rectangle(roi, rec_tl,rec_br,con.BD_OUTER_COLOR,1)
+     

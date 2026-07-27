@@ -86,7 +86,9 @@ def MainThread(frame_queue:queue.Queue,
         
         
         # Draw
+        hud_manager.draw_system_icon(frame)
         hud_manager.draw_mu_hud(frame)
+        hud_manager.draw_system_status_hud(frame)
         hud_manager.draw_sel_list(frame)
         # 
         hand_manager.update_skill(frame, current_skill_item, current_pose,tracked_faces)
@@ -110,7 +112,9 @@ def main():
              con.FULL_EXP // 2,
              con.FULL_ATTACK,
              ERole.MAIN_USER,
-             con.FULL_LEVEL)
+             con.FULL_LEVEL,
+            "True Dragon, Dream Creator, Greedy Dreamer",
+            "Hand Of Death, World of Dreamers")
     gun = Item(con.GUN_NAME, 
                con.GUN_DAMAGE, 
                con.GUN_IMAGE_LINK, 
@@ -132,12 +136,9 @@ def main():
                          hand, 
                          katana, 
                          potion,EItem.First)
-    hud_manager = HUDManager(EItem.First, 
-                            item_list,
-                            main_user,
-                            con.MAIN_HUD_TOP_LEFT,
-                            con.TOP_LEFT_ITEMS_LIST,
-                            con.CLOSE_LIST)
+    
+    
+    
     obama = User("Barrack Obama",
                  con.FULL_HP,
                  con.FULL_MP,
@@ -186,7 +187,20 @@ def main():
                                 ishowspeed,
                                 long,
                                 chow])
+    hud_manager = HUDManager(EItem.First, 
+                                item_list,
+                                main_user,
+                                con.MAIN_HUD_TOP_LEFT,
+                                con.TOP_LEFT_ITEMS_LIST,
+                                con.SYSTEM_ICON_TOP_LEFT,
+                                con.SYSTEM_ICON_TOP_RIGHT,
+                                con.SYSTEM_ICON_BOTTOM_RIGHT,
+                                con.SYSTEM_ICON_BOTTOM_LEFT,
+                                con.SYSTEM_ICON_PATH,
+                                con.CLOSE_LIST,
+                                con.CLOSE_SYS)
     
+        
     recognition_manager = RecognitionManager(con.RECOGNITION_IMAGES_PATH)
 
     # 3. ------ LSTM Manager ------------

@@ -25,10 +25,13 @@ DEFAULT_BAR_COLOR = (100, 100, 100)
 
 # Label/Rectangle Colors
 TEXT_OUTER_COLOR = (0, 200, 0)
-TEXT_INNER_COLOR = (150, 255, 150)
+TEXT_INNER_COLOR = (200, 255, 200)#(150, 255, 150)
+
 BD_OUTER_COLOR = (0, 200, 0)
 BD_INNER_COLOR = (150, 255, 150)
-BG_COLOR = (0, 60, 0)
+
+BG_COLOR =(20, 40, 20) #(0, 60, 0)
+
 REG_OUTER_BG_COLOR = (40, 30, 10)
 REG_OUTER_BD_COLOR = (90, 70, 20)
 SEL_OUTER_BG_COLOR = (85, 60, 15)
@@ -117,6 +120,7 @@ GUN_STEP = 10
 GUN_NAME = "gun"
 GUN_DAMAGE = 6
 GUN_IMAGE_LINK = "./assets/item/ball.png"
+EXPLODE_PROJECTILE = "./assets/item/explode.png"
 
 KATANA_NAME = "katana"
 KATANA_DAMAGE = 4
@@ -137,7 +141,8 @@ LIST_ITEM__SIZE = (60, 60)
 TOP_LEFT_ITEMS_LIST = (320 - 120, 240 - 30)
 OPEN_LIST = True
 CLOSE_LIST = False
-
+OPEN_SYS = True
+CLOSE_SYS = False
 # ==========================================
 # 7. Visual Effects (Damage)
 # ==========================================
@@ -150,3 +155,12 @@ DAMAGE_COLORS_BGR = [
     (0, 0, 140),
     (0, 0, 80),
 ]
+# ==========================================
+# 8. System Status Icon (Damage)
+# ==========================================
+SYSTEM_ICON_TOP_LEFT = (390,15)
+SYSTEM_ICON_TOP_RIGHT = (460,15)
+SYSTEM_ICON_BOTTOM_RIGHT = (460,55)
+SYSTEM_ICON_BOTTOM_LEFT = (390,55)
+SYSTEM_ICON_PATH =  "./assets/item/system_status.png"
+
