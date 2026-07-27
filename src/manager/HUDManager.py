@@ -212,4 +212,7 @@ class HUDManager:
                             con.TRANS_BETA,
                             con.TRANS_GAMMA,
                             roi)
-            roi[:,:] = (1-masks_image) * roi + masks_image * items_image 
+            roi[:,:] = (1-masks_image) * roi + masks_image * items_image
+            
+            
+     
