@@ -1,6 +1,12 @@
-<h1 align="center">🕵️‍♂️Face Recognition with YOLO, SORT, and FaceNet🕵️‍♂️</h1>
+<h1 align="center">⚔️ SRE Strike: Simple AR Game in Computer Vision ⚔️</h1>
+
 
 # Description
+
+### Objective
+
+### Architecture
+
 
 # Demo
 
@@ -22,8 +28,34 @@
 
 
 # Structure Folder
-
-
+```text
+SRE-Strike/
+├── assets/             # Non-script files
+│   ├── identity/             # User images trained for SVM
+│   └── item/                 # Images for game items
+├── my_notes/           # Project learnings and documentation
+│   ├── knowledge/            # Theoretical research
+│   └── tutorial/             # Step-by-step implementation guides
+├── src/                # Core application source code
+│   ├── entity/               # Base classes for objects
+│   ├── enum/                 # Custom data types
+│   ├── manager/              # Operations for entities
+│   ├── other/                # Constants and configuration
+│   └── utils/                # Static helper classes and utilities
+├── train/              # Training scripts
+│   ├── lstm/                 # Gesture sampling and model training
+│   └── segmentation/         # Training scripts for Google Colab
+├── weights/            # Model weights
+│   ├── action.h5             # LSTM action weights
+│   ├── hand_landmarker.task  # MediaPipe landmarks
+│   └── segmentation.pt       # Segmentation model weights
+├── .gitignore          # Files to ignore when stage commit
+├── demo.mp4            # Project demonstration video
+├── LICENSE             # GPL license
+├── main.py             # Main application entry point
+├── README.md           # Project description
+└── requirements.txt    # Project dependencies
+```
 # Run script
 
 - Step 1: clone the project
