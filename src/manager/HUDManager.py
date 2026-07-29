@@ -59,7 +59,12 @@ class HUDManager:
         
         img_bl = (img_tl[0], img_tl[1] + con.MAIN_IMAGE_HEIGHT + 4 * con.ADDITIONAL_SIZE)
         
-        self.img_hud_polygon = Polygon([img_tl,img_tr,img_br,img_bl]) 
+        self.img_hud_polygon = Polygon([img_tl,img_tr,img_br,img_bl])
+    def is_open_system_status(self):
+        return self.open_system_status
+    
+    def is_open_item_list(self):
+        return self.open_item_list
     def get_image_hud_polygon(self):
         return self.img_hud_polygon
     def get_selected_eitem(self):
@@ -115,8 +120,6 @@ class HUDManager:
                     self.open_system_status = con.CLOSE_SYS 
     
     def draw_system_icon(self,frame):
-        print(self.system_tl)
-        print(self.system_br)
         LabelDrawer.merge_tranparent_image(frame,
                                         self.sys_img, 
                                         self.system_tl,
@@ -136,9 +139,6 @@ class HUDManager:
         img_tl = (con.ADDITIONAL_SIZE, con.ADDITIONAL_SIZE)
         img_br = (img_tl[0] + con.MAIN_IMAGE_WIDTH, 
                 img_tl[1] + con.MAIN_IMAGE_HEIGHT)
-        
-        print(f"img tl:{(hud_top_left[0] + con.ADDITIONAL_SIZE, hud_top_left[1]+con.ADDITIONAL_SIZE)}\
-            br:{(hud_top_left[0] + img_br[0], hud_top_left[1] + img_br[1] )}")
         
         hp_p1 = (img_br[0] + 2 * con.ADDITIONAL_SIZE,
                 img_tl[1] + 2 * con.ADDITIONAL_SIZE)
@@ -186,6 +186,15 @@ class HUDManager:
         cv2.line(roi, mp_p1, curr_mp_p2, con.MP_INNER_COLOR, con.OTHER_BAR_THICK)
         
         # Vertical EXP bar
+        
+        
+        # LV_OUTER_COLOR = (0, 215, 255)   # BGR (Gold)
+        # LV_INNER_COLOR = (120, 255, 255)
+       
+        # LV_OUTER_COLOR = (220, 170, 0)
+        # LV_INNER_COLOR = (255, 255, 170)
+        LV_OUTER_COLOR = (0, 120, 220)
+        LV_INNER_COLOR = (80, 190, 255)
         exp_tp = (con.MAIN_EXP_BAR[0],
                   con.MAIN_EXP_BAR[1] - con.MAIN_VER_BAR_LENGTH)
         x1 = exp_tp[0] - 2* con.ADDITIONAL_SIZE - con.MAIN_HOR_BAR_THICK
@@ -201,9 +210,7 @@ class HUDManager:
         distance = math.dist(exp_p1, exp_p2)
         
         curr_exp_p2 = (exp_p1[0] , exp_p1[1]- int(distance * exp_ratio) )
-        
-        
-        
+
         cv2.line(roi_exp, 
                  exp_p1, 
                  exp_p2, 
@@ -213,7 +220,7 @@ class HUDManager:
         cv2.line(mask_exp, 
                  exp_p1, 
                  curr_exp_p2, 
-                 con.EXP_OUTER_COLOR, 
+                 LV_OUTER_COLOR, 
                  con.MAIN_VER_BAR_THICK)
         mask_exp = cv2.dilate(mask_exp,
                               con.DILATE_KERNEL,
@@ -228,8 +235,37 @@ class HUDManager:
         cv2.line(roi_exp, 
                  exp_p1, 
                  curr_exp_p2, 
-                 con.EXP_INNER_COLOR, 
+                 LV_INNER_COLOR, 
                  con.MAIN_VER_BAR_THICK)
+        
+        
+        
+        # Draw Level text above 
+        level = f"Lv. {self.main_user.get_level()}"
+        level_size,_ = cv2.getTextSize(level, cv2.FONT_HERSHEY_COMPLEX,0.6,2)
+        # level text will be above the exp bar like 30 px and center
+        pa = 10
+        roi_tl = (exp_tp[0] - level_size[0]//2 - pa,
+                    exp_tp[1] - 10 - level_size[1] - pa)
+        roi_br = (roi_tl[0] + level_size[0] + 2*pa,
+                    roi_tl[1] + level_size[1] + 2*pa)
+        lvl_roi = frame[roi_tl[1]:roi_br[1],
+                        roi_tl[0]:roi_br[0]]
+        lvl_mask_neon = np.zeros_like(lvl_roi, dtype=np.uint8)
+        lvl_br = (pa, pa+level_size[1])
+        
+        cv2.putText(lvl_mask_neon, level,lvl_br,cv2.FONT_HERSHEY_COMPLEX,0.6,LV_OUTER_COLOR,2)
+        lvl_mask_neon = cv2.dilate(lvl_mask_neon,
+                                    con.DILATE_KERNEL,
+                                    iterations=con.DILATE_ITERATION)
+                    
+                    # Step 2: Apply Blur
+        lvl_mask_neon = cv2.GaussianBlur(lvl_mask_neon,con.BLUR_KERNEL, 0)
+     
+        
+        cv2.putText(lvl_roi, level,lvl_br,cv2.FONT_HERSHEY_COMPLEX,0.6,LV_INNER_COLOR,2)
+        # cv2.rectangle(lvl_roi,(pa,pa),(pa+level_size[0],pa+level_size[1]),con.BD_INNER_COLOR,-1)
+
                        
     def draw_sel_list(self, frame):
         if self.open_item_list:

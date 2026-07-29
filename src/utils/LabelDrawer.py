@@ -343,7 +343,7 @@ class LabelDrawer:
         
         # name point
         name_point = (tl_x + con.PADDING, tl_y + ns_h + con.PADDING)
-        level_point = (tl_x + (rs_w - ls_w)//2 -2 ,
+        level_point = (tl_x + (rs_w - ls_w)//2 -4 ,
                     name_point[1] + con.LINE_SPACE + ls_h)
         # I don't knwo why there we have to give it for padding. I guess the putText already pad a little bit
         # if there is no padding, it will stick with the border

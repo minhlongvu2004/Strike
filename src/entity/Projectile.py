@@ -75,8 +75,10 @@ class Projectile:
         
     def update_direction(self, new_direction):
         # only take the unit to remove the unexpected speed
-        length = math.sqrt(new_direction[0]**2 + new_direction[1]**2)
         
+        length = math.sqrt(new_direction[0]**2 + new_direction[1]**2)
+        if length == 0:
+            length = 0.001
         self.direction = (new_direction[0]/ length,
                             new_direction[1]/ length)
         
