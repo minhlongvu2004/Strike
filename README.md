@@ -1,9 +1,24 @@
+<h1 align="center">🕵️‍♂️Face Recognition with YOLO, SORT, and FaceNet🕵️‍♂️</h1>
+
 # Description
 
 # Demo
 
-# Tech Used
 <video src="https://github.com/user-attachments/assets/565989c3-f70e-46aa-980f-b0911cc4ff86" width="60%" controls></video>
+
+# Tech Used
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Python-111d27?style=for-the-badge&logo=python&logoColor=3776AB" />
+  <img src="https://img.shields.io/badge/YOLO-111d27?style=for-the-badge&logo=ultralytics&logoColor=8A2BE2" />
+  <img src="https://img.shields.io/badge/MediaPipe-111d27?style=for-the-badge&logo=mediapipe&logoColor=4285F4" />
+  <img src="https://img.shields.io/badge/scikit--learn-111d27?style=for-the-badge&logo=scikitlearn&logoColor=F7931E" />
+  <img src="https://img.shields.io/badge/FaceNet-111d27?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/LSTM-111d27?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/SVM-111d27?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/OpenCV-111d27?style=for-the-badge&logo=opencv&logoColor=white" />
+  <img src="https://img.shields.io/badge/SORT-111d27?style=for-the-badge" />
+</p>
 
 
 # Structure Folder
@@ -49,8 +64,36 @@ python main.py
 
 # Troubleshoot
 
-## Mistmatch the name
+### 1. Mistmatch the name
+So it display the wrong name like below. My name is *Minh Long Vu* but it display me as *Stephen Chow*
+
+<img width="525" height="516" alt="Image" src="https://github.com/user-attachments/assets/97785f32-675f-4477-99d6-fd18b66d9444" />
+
 the Facenet/SVM work well for recognizing the face so if it display wrong name for you, it is likely there are no or not enough images for SVM to learn
 
-## List is out of index
-This is likely that you have image of your name but has not register it or misname it. For example my folder is "Minh Long" but the register name is "Mnh Long"
+**Solution**: 
+- Step 1: Create a folder with your name in /assets/identity
+<img width="407" height="281" alt="Image" src="https://github.com/user-attachments/assets/ed714296-6757-4f9f-b55e-881396ea08d6" />
+
+- Step 2: Gather around 20 images of yours and store it in the 
+<img width="983" height="465" alt="Image" src="https://github.com/user-attachments/assets/113cc20f-bca2-44dd-b158-69dc58444dd4" />
+Remember to crop your image so it contains only the face. This would significantly reduce the training time
+
+- Step 3: In the *main.py*, create new user and register it to User Manager.
+
+<img width="682" height="597" alt="Image" src="https://github.com/user-attachments/assets/e6657c9b-741e-40d2-9afc-48faa1e08943" />
+
+Please note that user name in User Object must match with the user name in your folder 
+
+
+### 2. List is out of index
+
+<img width="1397" height="410" alt="Image" src="https://github.com/user-attachments/assets/f0c07a10-9f1f-47fd-9a10-fce79b012028" />
+
+This is likely that you have image of your name but has not register it or misname it. For example my folder is "Minh Long" but the register name is "minh long vu"
+
+<img width="1057" height="311" alt="Image" src="https://github.com/user-attachments/assets/99eb8559-6e17-4672-8704-d4c97398b2a2" />
+
+*Solution*: Just try to match the *User* user name and the *folder* user name
+
+<img width="940" height="257" alt="Image" src="https://github.com/user-attachments/assets/838593e5-8626-446f-bebc-91ffc7252f88" />
