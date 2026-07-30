@@ -146,15 +146,15 @@ python main.py
 P/S: Not necessarily Python 3.12 just any stable version is fine
 
 # 6 Future Improvement
-- Adding a fine-tuned LLM: This would create personality for our system.
+- **Adding a fine-tuned LLM:** This would create personality for our system.
 
-- Adding RAG: Further extension from above, RAG would allow us to monitor the status of all users and recommend to the main player what he should do
+- **Adding RAG:** Further extension from above, RAG would allow us to monitor the status of all users and recommend to the main player what he should do
 
-- Using a game engine like Unity or OpenGL: For now, I just overlay those images to create an effect. It doesn't look quite good. It would be great if we could use OpenGL to make it more 
+- **Using a game engine like Unity or OpenGL:** For now, I just overlay those images to create an effect. It doesn't look quite good. It would be great if we could use OpenGL to make it more 
 
-- Increase the classes of LSTM: for now I only have 3-4 classes for LSTM. For a system game with many skills, it would be beneficial if we could train on more gestures to activate skills
+- **Increase the classes of LSTM:** for now I only have 3-4 classes for LSTM. For a system game with many skills, it would be beneficial if we could train on more gestures to activate skills
 
-- Improve the LSTM: The current LSTM accommodates the normalized position and difference with the previous frame for the speed. It works kind of acceptable, but I have to admit that it is somewhat overfitted to illustrate my idea. But we could accommodate features like angles or more. We could even utilize ensemble learning, such as as bagging
+- **Improve the LSTM:** The current LSTM accommodates the normalized position and difference with the previous frame for the speed. It works kind of acceptable, but I have to admit that it is somewhat overfitted to illustrate my idea. But we could accommodate features like angles or more. We could even utilize ensemble learning, such as as bagging
 
 # 7 Troubleshoot
 
@@ -166,16 +166,16 @@ So it displays the wrong name, like below. My name is *Minh Long Vu*, but it dis
 The Facenet/SVM works well for recognizing the face, so if it displays the wrong name for you, it is likely that there are no or not enough images for the SVM to learn.
 
 **Solution**: 
-- Step 1: Create a folder with your name in /assets/identity
+- ***Step 1:*** Create a folder with your name in /assets/identity
 <img width="407" height="281" alt="Image" src="https://github.com/user-attachments/assets/ed714296-6757-4f9f-b55e-881396ea08d6" />
 
-- Step 2: Gather around 20 images of yours and store them in the 
+- ***Step 2:*** Gather around 20 images of yours and store them in the 
 
 <img width="983" height="465" alt="Image" src="https://github.com/user-attachments/assets/113cc20f-bca2-44dd-b158-69dc58444dd4" />
 
 Remember to crop your image so it contains only the face. This would significantly reduce the training time
 
-- Step 3: In *main.py*, create a new user and register it to the User Manager.
+- ***Step 3:*** In *main.py*, create a new user and register it to the User Manager.
 
 <img width="682" height="597" alt="Image" src="https://github.com/user-attachments/assets/e6657c9b-741e-40d2-9afc-48faa1e08943" />
 
@@ -190,6 +190,6 @@ It is likely that you have an image of your name but have not registered it or m
 
 <img width="1057" height="311" alt="Image" src="https://github.com/user-attachments/assets/99eb8559-6e17-4672-8704-d4c97398b2a2" />
 
-*Solution*: Just try to match the *User* user name and the *folder* user name
+**Solution**: Just try to match the *User* user name and the *folder* user name
 
 <img width="940" height="257" alt="Image" src="https://github.com/user-attachments/assets/838593e5-8626-446f-bebc-91ffc7252f88" />
