@@ -1,4 +1,4 @@
-<h1 align="center">⚔️🛡️ SREL Strike: Simple AR Game 🛡️⚔️</h1>
+<h1 align="center">⚔️🛡️ Strike: Simple AR Game 🛡️⚔️</h1>
 
 # Table of Contents
 
@@ -38,7 +38,7 @@ The project could be illustrated as below
 <img width="828" height="415" alt="Image" src="https://github.com/user-attachments/assets/dd754829-ea16-4ffc-88a4-c86817fc25d9" />
 
 #### 1.2.1 Main Component Explanation
-The project mainly uses 4 AI models for separate tasks: Segmentation, Recognition, Estimation, and LSTM; thus the name SREL.
+The project mainly uses 4 AI models for separate tasks: Segmentation, Recognition, Estimation, and LSTM
 
 - ***Segmentation:*** Use the YOLO model to detect the face boundary to track the face and define the hitbox
 
@@ -81,7 +81,7 @@ Theoretically, I should have separated SORT, MediaPipe, LSTM, and UI into separa
 
 # 4 Structure Folder
 ```text
-SREL-Strike/
+Strike/
 ├── assets/             # Non-script files
 │   ├── identity/             # User images trained for SVM
 │   └── item/                 # Images for game items
@@ -112,7 +112,7 @@ SREL-Strike/
 
 - Step 1: Clone the project
 ```
-git clone https://github.com/minhlongvu2004/SREL-Strike.git
+git clone https://github.com/minhlongvu2004/Strike.git
 ```
 - Step 2: Create virtual environment
 ```
