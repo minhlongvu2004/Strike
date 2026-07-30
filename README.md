@@ -1,4 +1,4 @@
-<h1 align="center">⚔️ SREL Strike: Simple AR Game in Computer Vision ⚔️</h1>
+<h1 align="center">⚔️🛡️ SREL Strike: Simple AR Game in Computer Vision 🛡️⚔️</h1>
 
 # Table of Contents
 
@@ -23,9 +23,11 @@
 # 1 Description
 ## 1.1 Objective 
 ***For those who love novels***
+
 If you’ve ever read Solo Leveling, Nano Machine, or Omniscient Reader’s Viewpoint, you know the dream: having a personal, real-time AI interface to guide your path to the peak. This project is a first step toward that reality—an exploration of how modern technology can bridge the gap between imagination and a functional Augmented Reality (AR) interface.
 
 ***For Practical Problem-Solvers***
+
 Even if the concept of a "System" doesn't resonate with you, this project remains a powerful demonstration of hands-free technology. This AR interface enables you to access and interact with critical information on the fly, eliminating the need for a laptop or handheld computer.
 
 This is particularly invaluable in high-stakes environments where carrying bulky equipment is impossible—such as navigating a structure fire or operating in darkness where you must instantly identify and retrieve crucial objects. By leveraging a high-quality camera and a robust server to handle heavy AI model inference, this project proves that we can extend human perception and decision-making capabilities exactly when it matters most.
@@ -39,28 +41,24 @@ The project could be illustrated as below
 The project mainly uses 4 AI models for separate tasks: Segmentation, Recognition, Estimation, and LSTM; thus the name SREL.
 
 - ***Segmentation:*** Use the YOLO model to detect the face boundary to track the face and define the hitbox
-<br>
 
--*** Recognition:*** Since YOLO works well in determining general classes but is poor at detailed features such as faces, the FaceNet+SVM is utilized to handle this complex task. Recognition is to determine who is who
-<br>
+- ***Recognition:*** Since YOLO works well in determining general classes but is poor at detailed features such as faces, the FaceNet+SVM is utilized to handle this complex task. Recognition is to determine who is who
 
 - ***Estimation:*** It is also called Pose Estimation, more specifically in this project Hand Pose Estimation. This is to detect which finger is what and their position
-<br>
 
 - ***LSTM:*** The Estimation only shows where the fingers could be but doesn't show what gesture it is. The LSTM helps in determining not just what the current gesture is but also determines what action the hand is doing based on the temporal information(previous frames)
 
 #### 1.2.2 Rationale for the threads
-- Frame Thread: The reason why we need a separate thread for this is that ```cv2.imread```introduces around 5 ms latency. This means that it would block the main thread for that time. Fortunately, that function is written in C++, so it will release the GIL when it works in C++. Thus, a separate thread allows other operations during that time
-. <br>
+- ***Frame Thread:*** The reason why we need a separate thread for this is that ```cv2.imread```introduces around 5 ms latency. This means that it would block the main thread for that time. Fortunately, that function is written in C++, so it will release the GIL when it works in C++. Thus, a separate thread allows other operations during that time.
 
-- SELU Thread: 
+- ***SELU Thread:*** 
 Theoretically, I should have separated SORT, MediaPipe, LSTM, and UI into separate threads. The documentation of MediaPipe states that the image mode would [block](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker) the main thread. Thus, it might make sense if we use streaming, which is non-blocking. However, doing that might lead to a mismatch between the actual hand and the landmarks. I don't want that. I want the landmarks to stay exactly where the hand should be. Thus, I just put all of them together into one thread. 
-<br>
 
-- Recognition Thread: This thread is to recognize the cropped faces sent by the SELU thread. We have a separate thread for it because we accept that an image could take multiple frames to process. Whenever it is done, just update the value of ID to its corresponding faces.
-<br>
 
-- Main Thread: The main thread here means the main program. The reason why we need a separate one with SELU is that we use the ``` cv2.imshow```. As explained by this [comment](https://stackoverflow.com/questions/49096804/cv2-image-show-doesnt-work-when-multithreading), anything related to UI should be on the main thread. Additionally, ```cv2.imrshow``` also introduces additional latency around 5 ms. Having a separate thread for both ***cv2.imshow*** and ***cap.read*** would save around 10 ms.
+- ***Recognition Thread:*** This thread is to recognize the cropped faces sent by the SELU thread. We have a separate thread for it because we accept that an image could take multiple frames to process. Whenever it is done, just update the value of ID to its corresponding faces.
+
+
+- ***Main Thread:*** The main thread here means the main program. The reason why we need a separate one with SELU is that we use the ``` cv2.imshow```. As explained by this [comment](https://stackoverflow.com/questions/49096804/cv2-image-show-doesnt-work-when-multithreading), anything related to UI should be on the main thread. Additionally, ```cv2.imrshow``` also introduces additional latency around 5 ms. Having a separate thread for both ***cv2.imshow*** and ***cap.read*** would save around 10 ms.
 
 # 2 Demo
 
@@ -149,15 +147,12 @@ P/S: Not necessarily Python 3.12 just any stable version is fine
 
 # 6 Future Improvement
 - Adding a fine-tuned LLM: This would create personality for our system.
-<br>
 
 - Adding RAG: Further extension from above, RAG would allow us to monitor the status of all users and recommend to the main player what he should do
 
 - Using a game engine like Unity or OpenGL: For now, I just overlay those images to create an effect. It doesn't look quite good. It would be great if we could use OpenGL to make it more 
-<br>
 
 - Increase the classes of LSTM: for now I only have 3-4 classes for LSTM. For a system game with many skills, it would be beneficial if we could train on more gestures to activate skills
-<br>
 
 - Improve the LSTM: The current LSTM accommodates the normalized position and difference with the previous frame for the speed. It works kind of acceptable, but I have to admit that it is somewhat overfitted to illustrate my idea. But we could accommodate features like angles or more. We could even utilize ensemble learning, such as as bagging
 
