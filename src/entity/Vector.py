@@ -1,3 +1,15 @@
+"""
+Filename: Polygon.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script is for Vector Object
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 import math
 
 
