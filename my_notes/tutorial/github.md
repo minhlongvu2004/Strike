@@ -12,7 +12,7 @@
   - [1.6 Create a pull request](#step-6-create-a-pull-request)
   - [1.7 Merge the pull request](#step-7-merge-the-pull-request)
 - [2. Solve the conflict in the merge request](#2-solve-the-conflict-in-the-merge-request)
-  - [2.1 Create the pull request](#step-1-create-the-pull-request-1)
+  - [2.1 Create the pull request](#step-1-create-the-pull-request)
   - [2.2 Resolve conflict](#step-2-resolve-conflict)
   - [2.3 Merge the conflict](#step-3-merge-the-conflict)
 - [3. Add a license](#3-add-a-license)
@@ -20,8 +20,8 @@
   - [3.2 License template](#step-2-license-template)
   - [3.3 Choose a suitable license](#step-3-choose-a-suitable-license)
   - [3.4 Commit the changes](#step-4-commit-the-changes)
-- [4. Remove tracked file](#remove-tracked-file)
-- [5. Unrelated command lines for pip](#4-unrelated-command-lines-for-pip)
+- [4. Remove tracked file](#4-remove-tracked-file)
+- [5. Unrelated command lines for pip](#5-unrelated-command-lines-for-pip)
 
 </small>
 
@@ -46,10 +46,10 @@ If successful, you should see something as follows
 
 So there are three concepts here:
 
-- Default branch: [This](https://docs.github.com/en/pull-requests/reference/branches#about-the-default-branch) branch is the one shown to the user when they visit our GitHub repo. It is where pull requests are. Production-ready product should reside here
-- Your branch: [All](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) the branches that we have *push* access to (exclude the *main*)
-- Active branch: show all branches(exclude the main) that is commited in the last three months
-- Stale branch: opposite to active branch, show all branches that anyone has committed in the last three months. Recommended to be used to determine which branch to delete
+- **Default branch:** [This](https://docs.github.com/en/pull-requests/reference/branches#about-the-default-branch) branch is the one shown to the user when they visit our GitHub repo. It is where pull requests are. Production-ready product should reside here
+- **Your branch:** [All](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) the branches that we have *push* access to (exclude the *main*)
+- **Active branch:** show all branches(exclude the main) that is commited in the last three months
+- **Stale branch:** opposite to active branch, show all branches that anyone has committed in the last three months. Recommended to be used to determine which branch to delete
 
 
 ### Step 2: Create a new branch locally in Git
@@ -84,7 +84,7 @@ git branch -vv
 **Local Branch**: This is the one we just created  in step 2 and will be the one we manually update in the future
 ### Step 5: Switch between branches
 In git terminology, switching between branches is called *checkout*
-#### 5.1: using VS Code
+#### 5.1: Using VS Code
 From the left bottom corner, click on the branch name
 <img width="1437" height="622" alt="Image" src="https://github.com/user-attachments/assets/b8c4b4b8-2815-4b74-852f-3f07d8503cef" />
 Depending on which branch you want to switch to, click on its name in the *Branches* section
@@ -102,8 +102,8 @@ Go to the Pull Requests section and click on the new Pull Request
 In the following, choose **main*** for base and **status_hud** for change
 <img width="1562" height="635" alt="Image" src="https://github.com/user-attachments/assets/8b168e8b-f639-493d-bcfb-94e1046c5942" />
 
-- Base: [where](https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request) we want to merge the change to. It is the destination branch 
-- Compare: where we want to take the change from. It is the source branch
+- **Base:** [where](https://docs.github.com/en/pull-requests/how-tos/create-pull-requests/creating-a-pull-request) we want to merge the change to. It is the destination branch 
+- **Compare:** where we want to take the change from. It is the source branch
 So we take all the changes from **status_hud** and merge them into the base **main**
 Then click on Create New Pull Request
 <img width="1567" height="665" alt="Image" src="https://github.com/user-attachments/assets/28957814-cecf-4f04-8d8a-7d57853568f0" />
@@ -159,7 +159,7 @@ Name the file "LICENSE," and it should pop up the phrase "Choose a license templ
 
 ### Step 3: Choose a suitable license
 The top three bold ones are popular:
-- ***Apache License:***For large projects where it needs some protection
+- ***Apache License:*** For large projects where it needs some protection
 - ***GNU General Public License v3.0:*** If someone uses the code in their project, they also need to release the project under the same GPL license. However, they only need to do this if they intend to publish source code on the internet. If they use it internally, they are not obligated to do [so](https://vendure.io/blog/busting-the-myth-of-gpl)
 - ***MIT License:*** For most personal projects and portfolio. Basically do whatever you want, but notice 
 Since this project is mainly for portfolio, I was intending to choose the MIT license. HOWEVER, the sort implementation I used had the GPL license. This means that I have to make it GPL as well. You can quickly check if the license you chose is compatible [here](https://fossa.com/resources/license-compliance-tools/license-compatibility-checker/gpl-3-0-vs-mit/). So we will choose GPL 3.0
