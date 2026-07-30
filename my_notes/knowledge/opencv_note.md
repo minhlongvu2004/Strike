@@ -1,5 +1,19 @@
 <h1 align="center"> 📝OpenCV Note📝 </h1>
 
+# Table of Contents
+
+<small>
+
+- [1. Dilation](#1-dilation)
+- [2. Save time with ROI instead of full frame](#2-save-time-with-roi-instead-of-full-frame)
+  - [2.1 Measurement](#21-measurement)
+  - [2.2 How do I optimize it?](#22-how-do-i-optimize-it)
+- [3. Problem with image slicing](#3-problem-with-image-slicing)
+- [4. Transparent image](#4-transparent-image)
+- [5. Draw dark haki hand](#5-draw-dark-haki-hand)
+
+</small>
+
 # 1 Dilation
 So basically, the way we make a gloom effect by using thicker text, blurring, and placing the brighter 
 in the middle is kinda obsolete. This can be seen below.
@@ -257,7 +271,7 @@ Note that you have an object without a black bounding box
 
 It is so funny that the above image is the problem I stated when I was writing the draft. I even wrote detail what the problem was, and then I just solved it while writing that.
 
-**Step 1: Define  the ROI**
+- **Step 1: Define  the ROI**
 Let's first define the roi to reduce the cost of operation. We need to find the possible top left, so we will use np.min(axis=0). **axis = 0** means it targets the row, so all rows will be aggregated into a single row and return the min/max of that column
 ```python
 points = np.array(self.landmarks)
@@ -308,7 +322,7 @@ You can consult the landmark image below.
 
 <img width="1543" height="538" alt="Image" src="https://github.com/user-attachments/assets/3efec22a-f08a-4e09-861c-b8a925d2ea42" />
 
-**Step 5: Apply dilation to both mask**
+- **Step 5: Apply dilation to both mask**
 ```python
 kernel_outer = np.ones((5, 5), np.uint8)
 mask_outer = cv2.dilate(mask_outer, kernel_outer, iterations=8)
@@ -323,7 +337,7 @@ mask_middle = cv2.dilate(mask_middle, kernel_midle, iterations=5)
 # Only where the blur_mask is bright will this color appear
 ```
 Notice that the outer mask has higher iterations and kernel, so it would draw a bigger hand
-**Step 6: Blend them into a single mask**
+- **Step 6: Blend them into a single mask**
 Combine them together and then apply Gaussian blur
 ```python
 # Blend the resulting purple aura onto the original image
@@ -332,7 +346,7 @@ cv2.addWeighted(mask_middle, 1.0, mask_outer, con.AURA_INTENSITY,0, mask_outer)
 cv2.GaussianBlur(mask_outer,(5,5),3,mask_outer)
 ```
 We now have a mask with two layers of neon effect
-**step 7: Draw the haki core**
+- **step 7: Draw the haki core**
 Now we draw the hand again and fill the palm
 ```python
 for start, end in con.HAND_CONNECTIONS:
@@ -343,7 +357,7 @@ We now have a haki-style hand. However, as you can see, we are using mask_outer,
 My idea is to make the transparent variable alpha like what we did to a transparent image. 
 So how do we make this variable?
 Since we are using black, we can set the condition where a pixel is black to have a transparency of 0, whereas anything above is 1
-**step 8: Make alpha mask**
+- **step 8: Make alpha mask**
 ```python
 # convert to 2D gray color
 gray_mask = cv2.cvtColor(mask_outer, cv2.COLOR_BGR2GRAY) 
@@ -370,7 +384,7 @@ contour = contours[0]
 ```
 Well, this is not good, and in the future we need to associate the contour with the hand.
 
-**Step 11: Find the Polygon**
+- **Step 11: Find the Polygon**
 So the contour we have now is somewhat arbitrary. We need to find the smallest convex polygon to represent the hit box area for us
 ```python
 hand_boundary = np.squeeze(cv2.convexHull(contour))
