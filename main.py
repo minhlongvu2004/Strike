@@ -228,15 +228,6 @@ def main():
                                   con.IOU_THRESHOLD,
                                   user_manager)
     
-    # def MainThread(frame_queue:queue.Queue,
-    #            read_queue: queue.Queue,
-    #            yolo_manager: YOLOManager,
-    #            main_user: User,
-    #            hand_manager: HandManager,
-    #            lstm_manager: LSTMManager,
-    #            hud_manager: HUDManager,
-    #            projectile_manager: ProjectileManager):
-    
     frame_queue = queue.Queue(maxsize=QUEUE_MAX_SIZE)
     ready_queue = queue.Queue()
     recognition_queue = queue.Queue()

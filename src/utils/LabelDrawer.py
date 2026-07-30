@@ -1,5 +1,17 @@
-import math
+"""
+Filename: LabelDrawer.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script perform drawing operations.
+"""
 
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
+
+import math
 import cv2
 import numpy as np
 from src.entity import User
@@ -10,8 +22,33 @@ class LabelDrawer:
     @staticmethod
     def draw_labels(frame,
                    tracked_faces):
-        # tracked_faces  is an array of [tl,br,id, crop,segment,user]
-        # for bounding_box, user in (bounding_boxes, users):
+        """
+        Summary:
+            Like the name suggest, this function is to draw the labels
+
+        Args:
+            frame: np.ndarray  
+                The image frame to draw into
+            tracked_faces: list[list[]]
+                A list of tracked faces. Each track face is represented by list of
+                [tl,br, id, crop, segment, user] where
+                    tl: tuple[int,int]
+                        Top left point of face bounding box 
+                    br: tuple[int,int]
+                        Bottom right point of face bounding box
+                    id: int
+                        Id of tracked face provided by SORT
+                    crop: np.ndarray
+                        cropped of actual image about the face
+                    segment: list[tuple[int,int]]
+                        List of vertices that represent the face segment (polygon)
+                    user: User
+                        The user type that associated with the tracked face
+        
+        Return:
+            None
+        """
+        
         for tracked_face in tracked_faces:
             LabelDrawer.draw_label(frame,
                                    tracked_face[0],
@@ -23,6 +60,25 @@ class LabelDrawer:
                    top_left,
                    bottom_right,
                    user:User):
+        
+        """
+        Summary:
+            Draw label for a specific user. Depends on their hp, we could draw live label or death label
+            
+        Args:
+            frame: np.ndarray
+                The image frame to draw into
+            top_left: tuple[int,int]
+                Top left point of face bounding box 
+            bottom_right: tuple[int,int]
+                Bottom right of face boundign box
+            user: User
+                The user associated with that bounding box
+        
+        Return:
+            None        
+        """
+        
         x1,y1 = top_left
         x2,y2 = bottom_right
         length = min(x2-x1,y2-y1) // 6
@@ -73,7 +129,23 @@ class LabelDrawer:
     def draw_live_label(image,
                top_left,
                user: User):
-    # rectangle, name and label sizes
+        """
+        Summary:
+            Draw the live label where there is neon HP and MP bars. The general theme is neon green
+
+        Args:
+            image: np.ndarray
+                The image frame to draw into
+            top_left: tuple[int,int]
+                Top Left of label
+            user: User
+                The user associated with the label
+        
+        Return:
+            None
+        """
+        
+        
         name = user.get_name()
         level = user.get_level()
         level = f"Lv. {level}"
@@ -210,6 +282,30 @@ class LabelDrawer:
                                length,
                                outer_color,
                                inner_color):
+        """
+        Summary:
+            Draw the neon bounding box. Doesn't draw a complete box but small line-segment from each of
+            of the corner in neon style
+
+        Args:
+            frame: np.ndarray
+                The image frame to draw into
+            p1: tuple[int, int]
+                The top left of the bounding box
+            p2: tuple[int, int]
+                Bottom right of the bounding box
+            length: int
+                The length of each line segment
+            outer_color: tuple[int,int,int]
+                The color for outer layer
+            inner_color: tuple[int,int,int]
+                The color for inner color
+        
+        Return:
+            None
+        """
+        
+        
         x1,y1 = p1
         x2,y2 = p2
         l = length
@@ -271,7 +367,34 @@ class LabelDrawer:
         cv2.line(roi, br, br_hor, inner_color,con.CORNER_BAR_THICKNESS)
         cv2.line(roi, br, br_ver, inner_color,con.CORNER_BAR_THICKNESS)
     @staticmethod
-    def draw_line_connector(frame,box_point,rect_point,outer_color,inner_color):
+    
+    
+    def draw_line_connector(frame,
+                            box_point,
+                            rect_point,
+                            outer_color,
+                            inner_color):
+        
+        """
+        Summary:
+            Draw the line connected between label and neon bounding box
+            
+        Args:
+            frame: np.ndarray
+                The image frame to draw into
+            box_point: tuple[int,int]
+                The point of bounding box
+            rect_point: tuple[int,int]
+                The point of label
+            outer_color: tuple[int,int,int]
+                The color of outer layer
+            inner_color: tuple[int,int,int]
+                The color of inner layer
+                
+        Return:
+            None
+        """
+        
         a = con.ADDITIONAL_SIZE
         x1, y1 = box_point
         x2, y2 = rect_point
@@ -301,6 +424,24 @@ class LabelDrawer:
     def contrain_coordinate(coordinate_list,
                             additional_size,
                             height_or_width):
+        
+        """
+        Summary:
+            To contrain the position to make sure it doesn't exceed 0 or maximum height or width
+            
+        Args:
+            coordinate_list: list[int]
+                List of coordinate to be contrained
+            additional_size: int
+                Possible padding 
+            height_or_width: int
+                Maximum value that the coordinate can not exceed
+        
+
+        Returns:
+            None
+        """
+        
         a = additional_size
         contrained_coordinates = []
         for coor in coordinate_list:
@@ -314,6 +455,19 @@ class LabelDrawer:
     
     @staticmethod
     def calculate_size_label(user:User):
+        
+        """
+        Summary:
+            Calculate the size for the rectangle(roi), name, and label        
+
+        Args:
+            user: User
+                The user associated with the label
+        
+        Return:
+            tuple(int,int), tuple(int,int), tuple(int,int):
+                Return the size of rectangle, name, and label
+        """
         name = user.get_name()
         level = user.get_level()
         level = f"Lv. {level}"
@@ -331,19 +485,36 @@ class LabelDrawer:
     
     @staticmethod
     def calculate_points(top_left,
-                     rectangle_size,
+                     label_size,
                      name_size,
                      level_size):
-    
+        """
+        Summary:
+            Like the name suggest, calculate all the nessecary points to draw element
+            in the label
+
+        Args:
+            top_left: tuple[int,int]
+                The top left of the label
+            rectangle_size: tuple(int,int)
+                The size of the label ()
+            
+
+        Return:
+            Six tuple[int,int]:
+                They are the coordinates to draw 
+        """
+        
+        
         # Remember that the putText point is is the bottom left
         tl_x,tl_y = top_left
-        rs_h,rs_w = rectangle_size
+        lb_h,lb_w = label_size
         ns_h,ns_w = name_size
         ls_h,ls_w = level_size
         
         # name point
         name_point = (tl_x + con.PADDING, tl_y + ns_h + con.PADDING)
-        level_point = (tl_x + (rs_w - ls_w)//2 -4 ,
+        level_point = (tl_x + (lb_w - ls_w)//2 -4 ,
                     name_point[1] + con.LINE_SPACE + ls_h)
         # I don't knwo why there we have to give it for padding. I guess the putText already pad a little bit
         # if there is no padding, it will stick with the border
@@ -364,6 +535,23 @@ class LabelDrawer:
     def draw_death_label(image,
                      top_left,
                      user:User):
+        """
+        Summary:
+            Draw the death label. It is similiar but not the same as live label because
+            it doesn't draw the neon bars just default one and merge the transparent death 
+            image to the label
+
+        Args:
+            image: np.ndarray
+                The image frame to draw into
+            top_left: tuple[int,int]
+                The top left point of the label
+            user: User
+                The user associated with the label
+        Return:
+            None
+        """
+               
         name = user.get_name()
         level = user.get_level()
         level = f"Lv. {level}"
@@ -389,14 +577,6 @@ class LabelDrawer:
         mp_ratio = user.get_mp() / con.FULL_MP
         distance = math.dist(hp_p1, hp_p2)
         
-        curr_hp_p2 = (hp_p1[0] + int(distance * hp_ratio), hp_p1[1] )
-        curr_mp_p2 = (mp_p1[0] + int(distance * mp_ratio), mp_p1[1] )
-        #### Transparent rectangle first
-        # y1 = max(0, top_left[1] - a)
-        # y1 = min(480, top_left[1] - a)
-        # y2 = min(480, bottom_right[1] + a)
-        # x1 = max(0, top_left[0] - a)
-        # x2 = min(640, bottom_right[0] + a)
         y1 = max(0, min(480, top_left[1] - a))
         y2 = max(0, min(480, bottom_right[1] + a))
 
@@ -471,6 +651,26 @@ class LabelDrawer:
                           item,
                           top_left,
                           bottem_right):
+        """
+        Summary:
+            Basically merge the transparent item into the frame with a specified size
+
+        Args:
+            frame: np.ndarray
+                The image frame to draw into
+            item: np.ndarray
+                The transparent image. It is better to be call transparent object
+            top_left: tuple[int,int]
+                The top left of the item
+            bottem_right: tuple[int,int]
+                The bottom right of the item
+        
+        Return:
+            None
+        """
+        
+        
+        
         '''
         lets call item is F for foreground
         and our image is B for background
@@ -478,7 +678,7 @@ class LabelDrawer:
         if normalized alpha is 0, this mean we only take the background
         if it is 1, this mean we only take the foreground
         Therefore the math should be
-        new_image = 
+        new_image = (1 - alpha) * B + alpha * F
         '''
         hor_length = bottem_right[0] - top_left[0]
         ver_length = bottem_right[1] - top_left[1]
@@ -509,12 +709,18 @@ class LabelDrawer:
             
     @staticmethod
     def find_center_image(img):
-        
             """
-            find_center_image: calculate of the center of an images
-            img: the numpy array of image
-            return: Position tuple of center point
-            """
+            Summary:
+                Just find the center of the input image
+
+            Args:
+                img: np.ndarray
+                    The input image need to find center
+
+            Return:
+                tuple[int,int]:
+                    Position of center image
+            """            
             
             width = img.shape[0]
             height = img.shape[1]
@@ -524,15 +730,27 @@ class LabelDrawer:
     @staticmethod
     def get_points_for_connector(img,tl_p1,br_p2, length, rect_width, rect_height):
         """
-        get_points_for_connector: get the two ends of connectors and bottom left of the label
-        img: numpy array of the orgional image
-        (x1,y1): Top left position of the detected face
-        (x2,y2): Bottom right position of the detected face
-        length: the length of the connector line
-        rect_width: the width of the label rectangle 
-        rect_height: the length of the label rectangle
-        return: Return one connected to detected object, the other end connected to label 
-        and bottom left of label
+        Summary: 
+            Get the two ends of connectors and bottom left of the label
+
+        Args:
+             img: np.ndarray
+                The image frame to draw into
+            tl_p1: tuple[int,int] 
+                Top left position of the detected face
+            br_p2: tuple[int,int] 
+                Bottom right position of the detected face
+            length: int
+                the length of the connector line
+            rect_width: int
+                the width of the label rectangle 
+            rect_height: int
+                the height of the label rectangle
+
+        Return: 
+            Tuple[int,int], Tuple[int,int], Tuple[int,int]:
+                Return one connected to detected object, the other end connected to label 
+                and bottom left of label
         """
         x1,y1 = tl_p1
         x2,y2 = br_p2
@@ -580,6 +798,16 @@ class LabelDrawer:
         return face_connect, label_connect, bottom_left_label
     @staticmethod
     def calculate_size_label(user: User):
+        """
+        Summary:
+
+        Args:
+            
+
+        Returns:
+        """
+        
+        
         name = user.get_name()
         level = user.get_level()
         level = f"Lv. {level}"
@@ -599,6 +827,27 @@ class LabelDrawer:
                      image,
                      top_left,
                      bottom_right):
+        
+        """
+        Summary:
+            The main idea is to cut any part of the image that exceed the frame to
+            avoid slicing dimension 0
+
+        Args:
+            frame:
+                The image frame to draw into
+            image:
+                The image object to be cut
+            top_left: tuple[int,int]
+                The top left of image object
+            bottom_right: tuple[int,int]
+                The bottom right of image object
+
+        Return:
+            tuple[int,int], tuple[int,int], np.ndarray:
+                Return new top left, new bottom right, and new cut image
+        """
+        
         f_h, f_w,_ = frame.shape
         
         i_h, i_w, _ = image.shape
