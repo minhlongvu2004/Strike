@@ -1,5 +1,6 @@
 <h1 align="center"> 🖋️Segmentation & Estimation🖋️ </h1>
 
+# Table of Contents
 
 <small>
 
