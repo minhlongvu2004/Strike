@@ -1,4 +1,4 @@
-<h1 align="center">⚔️🛡️ SREL Strike: Simple AR Game in Computer Vision 🛡️⚔️</h1>
+<h1 align="center">⚔️🛡️ SREL Strike: Simple AR Game 🛡️⚔️</h1>
 
 # Table of Contents
 
