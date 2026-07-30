@@ -44,7 +44,7 @@ def FaceRecognitionThread(recognition_manager: RecognitionManager,
             recognize_users = recognition_manager.recognize_users(faces,ids)
             user_manager.register_users(recognize_users)
         
-def MainThread(frame_queue:queue.Queue,
+def SELUThread(frame_queue:queue.Queue,
                read_queue: queue.Queue,
                recognition_queue: queue.Queue,
                yolo_manager: YOLOManager,
@@ -243,7 +243,7 @@ def main():
     capture_worker = threading.Thread(target = FrameCaptureThread,
                                     args=(frame_queue,),
                                     daemon=True)
-    main_worker = threading.Thread(target = MainThread,
+    main_worker = threading.Thread(target = SELUThread,
                                     args=(frame_queue,
                                           ready_queue,
                                           recognition_queue,
@@ -281,7 +281,7 @@ def main():
         if len(time_buffer) == 20:
             moving_average = len(time_buffer)/ sum(time_buffer)
             cv2.putText(ready_frame,f"FPS: {moving_average:.0f}",(10,10),cv2.FONT_HERSHEY_COMPLEX,0.4,(123,123,123),1)
-        cv2.imshow("SRE Strike", ready_frame)
+        cv2.imshow("SREL Strike", ready_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

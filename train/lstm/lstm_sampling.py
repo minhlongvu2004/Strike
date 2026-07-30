@@ -118,7 +118,7 @@ def sample_video(label,
         draw_landmarks(frame, detection_result)
         
         if clicked == False: 
-            frame = draw_waiting_text(frame)
+            frame = draw_waiting_text(frame, frame_duration)
         else:
             # captured_video.append(frame)
             world_points = get_world_points(detection_result)
@@ -153,9 +153,9 @@ def sample_video(label,
     cap.release()
     cv2.destroyAllWindows()
     
-def draw_waiting_text(frame):
+def draw_waiting_text(frame, frame_duration):
     h,w,_ = frame.shape
-    text = "Click S to start 1s Record"
+    text = f"Press S to start {frame_duration} frames Record"
     size, _ = cv2.getTextSize(text, FONT, FONT_SCALE, THICKNESS)
     width, height = size
     
