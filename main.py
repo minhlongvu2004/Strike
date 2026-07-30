@@ -1,3 +1,16 @@
+"""
+Filename: main.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script run the main program
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
+
 from collections import deque
 import queue
 import threading
@@ -10,14 +23,24 @@ from src.manager import HandManager,HUDManager,LSTMManager,ProjectileManager,\
     RecognitionManager,TrackerManager,UserManager,YOLOManager
 from src.entity import User, Item, ItemList
 import cv2
-
 import numpy as np
 
 QUEUE_MAX_SIZE = 1
 
 
 def FrameCaptureThread(frame_queue: queue.Queue):
-    # remember to set the max size for queue
+    
+    """
+    Summary:
+        A thread for capturing video
+        
+    Args:
+        frame_queue: queue.Queue
+            A queue to put image to
+        
+    Return:
+        None
+    """
     
     cap = cv2.VideoCapture(0)
     while True:
@@ -29,6 +52,22 @@ def FrameCaptureThread(frame_queue: queue.Queue):
 def FaceRecognitionThread(recognition_manager: RecognitionManager,
                           user_manager: UserManager,
                           recognition_queue: queue.Queue):
+    
+        """
+        Summary:
+            A thread for recognizing the cropped faces
+            
+        Args:
+            recognition_manager: RecognitionManager
+                Recognition manager used to recognize image
+            user_manager: UserManager
+                Manager to register user
+            recognition_queue: queue.Queue
+                The queue to get the cropped needed to recognize
+
+        Return:
+            None
+        """
     
         # this recognition queue is a list of tuple 
         # (faces,id)
@@ -54,6 +93,36 @@ def SELUThread(frame_queue:queue.Queue,
                hud_manager: HUDManager,
                projectile_manager: ProjectileManager,
                track_manager: TrackerManager):
+    """
+    Summary: 
+        A bulky thread that do everything from segmentation->tracking->handestimation
+        -> LSTM -> Drawing UI
+
+    Args:
+        frame_queue: queue.Queue
+            A queue to get the frame from
+        read_queue: queue.Queue
+            A queue to put the ready to display frame to
+        recognition_queue: queue.Queue
+            A queue to send the untracked cropped faces to
+        yolo_manager: YOLOManager
+            Object related to segmentation
+        main_user: User
+            The main user who play the Application
+        hand_manager: HandManager
+            The object related to the Mediapipe Hand Landmarks
+        lstm_manager: LSTMManager 
+            The object related to LSTM model to detect action
+        hud_manager: HUDManager
+            The object related to drawing the main UI Hud
+        projectile_manager: ProjectileManager
+            The object related to tracking projectile
+        track_manager: TrackerManager
+            The object related to tracking the faces
+
+    Return:
+        None
+    """
     frame_counter = 0
     while True:
         frame = frame_queue.get()
