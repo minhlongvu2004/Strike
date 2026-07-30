@@ -1,3 +1,15 @@
+"""
+Filename: ProjectileManager.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script is for managing the projectile
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 import cv2
 import numpy as np
 from src.enum import EStatus
@@ -6,13 +18,40 @@ from src.entity import Polygon
 from src.other import constants as con
 
 class ProjectileManager:
+    """
+    Summary:
+        This class is for LSTM model
+    
+    Fields:
+        projectiles: list[Projectile]
+            List of projectile
+    
+    Methods:
+        add_projectile
+        update
+        draw
+    """    
+    
     def __init__(self):
         self.projectiles = []
         # self.collide = False
-    def add_projectile(self,projectile):
+    def add_projectile(self, projectile):
         self.projectiles.append(projectile)
     
     def update(self, img_shape, tracked_faces):
+        """
+        Summary:
+            Update the status of the projectile
+
+        Args:
+            img_shape: tuple(int,int,int)
+            tracked_faces: List[list[]]
+                A list of list of data about face
+    
+        Return:
+            None
+        """
+        
         
         '''
         faces: array of polygon vertices of a face. Each face is an array of
@@ -56,6 +95,16 @@ class ProjectileManager:
 
     
     def draw(self, image):
+        """
+        Summary:
+            Draw all the projectile based on their statys
+
+        Args:
+            img_shape: np.ndarray
+    
+        Return:
+            None
+        """
         for pro in self.projectiles:
             status = pro.get_status()
             if status == EStatus.MOVING or\

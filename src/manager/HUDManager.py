@@ -1,8 +1,19 @@
-import math
+"""
+Filename: HUDManager.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script draw the UI for the main HUD. Main HUD contains 
+HP,MP,Item, Status bag
+"""
 
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
+import math
 import cv2
 import numpy as np
-
 from src.enum import EItem
 from src.entity import ItemList, Polygon, User
 from src.utils import SAT, LabelDrawer
@@ -11,6 +22,61 @@ from src.other import constants as con
 
 
 class HUDManager:
+    """
+    Summary:
+        This class is for drawing the main HUD UI.
+    
+    
+    Fields:
+        selected_eitem: EItem
+            The current selected EItem
+        item_list: ItemList
+            The object that contains list of item
+        main_user: User
+            The main user who plays application
+        hud_top_left: tuple[int,int]
+            The top left of the hud ROI
+        items_list_top_left: tuple[int, int]
+            Top left of item list
+        system_top_left: tuple[int,int]
+            Top left of the system status icon
+        system_top_right: tuple[int,int]
+            Top right of the system status icon
+        system_bottom_right: tuple[int,int]
+            Bottom right of the system status icon
+        system_bottom_left: tuple[int,int]
+            Bottom left of the system status icon
+        system_path: str
+            The path to the system status icon
+        sys_img: np.ndarray
+            The system status image
+        open_item_list: bool
+            If the list of items is open
+        open_system_status: bool
+            If the system status icon is open
+        system_polygon: Polygon
+            The system status polygon
+        img_hud_polygon: Polygon
+            The selected item UI polygon
+        start_count: int
+            The time reference for calculating duration
+    
+    Methods:
+        is_open_system_status
+        is_open_item_list
+        get_image_hud_polygon
+        get_selected_eitem
+        get_item
+        check_if_select_items_list
+        get_system_icon_polygon
+        check_if_click_item_hud
+        draw_system_icon
+        draw_mu_hud
+        draw_sel_list
+        draw_system_status_hud
+    """
+    
+    
     def __init__(self,
                  selected_eitem: EItem,
                  item_list: ItemList,
@@ -60,6 +126,7 @@ class HUDManager:
         img_bl = (img_tl[0], img_tl[1] + con.MAIN_IMAGE_HEIGHT + 4 * con.ADDITIONAL_SIZE)
         
         self.img_hud_polygon = Polygon([img_tl,img_tr,img_br,img_bl])
+    # Getter
     def is_open_system_status(self):
         return self.open_system_status
     
@@ -71,10 +138,28 @@ class HUDManager:
         return self.selected_eitem
     def get_item(self):
         return self.item_list.get_item(self.get_selected_eitem())
-        
+    def get_system_icon_polygon(self):
+            return self.system_polygon   
+    
+    
+    
     def check_if_select_items_list(self, 
                                  current_gesture,
                                  if_polygon):
+        """
+        Summary:
+            Check if the user click one of the item in the item list
+
+        Args:
+            current_gesture: str
+                The current action of user
+            if_polygon: Polygon
+                Index finger polygon
+        
+        Return:
+            None
+        """
+        
         items_polygon = self.item_list.get_items_polygons()
         if current_gesture == "click" and \
             if_polygon is not None and\
@@ -85,11 +170,25 @@ class HUDManager:
                 if SAT.check_collide(item_polygon,
                                     if_polygon):
                     self.selected_eitem = item
-    def get_system_icon_polygon(self):
-        return self.system_polygon   
+    
     def check_if_click_item_hud(self,
                                  current_gesture,
                                  if_polygon:Polygon):
+
+        """
+        Summary:
+            Check if the user click the item in the HUD
+
+        Args:
+            current_gesture: str
+                The current action of user
+            if_polygon: Polygon
+                Index finger polygon
+        
+        Return:
+            None
+        """
+
         img_polygon = self.get_image_hud_polygon()
         sys_polygon = self.get_system_icon_polygon()
         
@@ -120,6 +219,17 @@ class HUDManager:
                     self.open_system_status = con.CLOSE_SYS 
     
     def draw_system_icon(self,frame):
+        """
+        Summary:
+            Draw system status icon
+
+        Args:
+            frame: np.ndarray
+                the image frame to draw into
+        
+        Return:
+            None
+        """
         LabelDrawer.merge_tranparent_image(frame,
                                         self.sys_img, 
                                         self.system_tl,
@@ -127,6 +237,20 @@ class HUDManager:
                                         )
     
     def draw_mu_hud(self, frame):
+        """
+        Summary:
+            Draw main UI HUD including selected item, hp bar, mp bar, level bar, and level text. Since
+            the system status was written later so it is in seperate function
+
+        Args:
+            frame: np.ndarray
+                the image frame to draw into
+        
+        Return:
+            None
+        """ 
+        
+        
         main_user = self.main_user
         hud_top_left = self.hud_top_left
         
@@ -268,6 +392,19 @@ class HUDManager:
 
                        
     def draw_sel_list(self, frame):
+
+        """
+        Summary:
+            Draw the list of items. The selected item will have neon lighter border
+
+        Args:
+            frame: np.ndarray
+                the image frame to draw into
+        
+        Return:
+            None
+        """
+
         if self.open_item_list:
             sel_item = self.selected_eitem
             
@@ -302,6 +439,19 @@ class HUDManager:
             
     def draw_system_status_hud(self,
                            frame):
+
+        """
+        Summary:
+            Draw system status hud
+
+        Args:
+            frame: np.ndarray
+                the image frame to draw into
+        
+        Return:
+            None
+        """
+
         if self.open_system_status:
             user = self.main_user
             img_h,img_w,_ = frame.shape

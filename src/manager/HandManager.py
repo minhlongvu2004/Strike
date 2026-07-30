@@ -1,3 +1,15 @@
+"""
+Filename: HandManager.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script perform operations related to Mediapipe Hand Landmarks
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 from collections import deque
 import math
 
@@ -14,8 +26,50 @@ from src.other import constants as con
 
 
 
-
 class HandManager:
+    """
+    Summary:
+        This class represent the Mediapipe Hand
+        
+    Fields:
+        1. detector:
+            The Mediapipe model
+        2. timestamp: int
+            timestamp for the Mediapipe model
+        3. pre_frame: list[]
+            The previous frame
+        4. landmarks: list[tuple[int,int]]
+            List of landmarks
+        5. worl_landmarks: list[tuple[int,int]]
+            List of world landmarks     
+        6. processed_sequence: deque
+            A sequence of pre-processed world landmarks frames. Intended to 
+            be fed into LSTM model
+        7. gun_counter: int
+            Count the number of frame that the gun skill exists
+        8. gun_current_skill: str
+            The current action skill
+        9. gun: Item
+            The object gun of class Item
+        10. hand_boundary_polygon:
+            The polygon of hand dark haki hand
+        11. hand_counter: int
+            Count the number of frame that the haki hand exists. Mainly use for fill the face polygon where different
+            hand_counter have differnt color
+
+        
+    Methods:
+        1. detect_landmarks
+        2. get_gun_pos_dir
+        3. get_index_finger_polygon
+        4. get_sequence
+        5. process_world_points
+        6. reset_gun
+        7. reset_hand
+        8. update_skill
+        9. draw_land_mark
+        10. draw_glowing_haki_hand
+    """
     def __init__(self, main_user, projectile_manager: ProjectileManager):
         self.main_user = main_user
         self.projectile_manager = projectile_manager
@@ -40,7 +94,18 @@ class HandManager:
         self.hand_counter = 0
 
         
-    def detect_landmarks(self,frame):
+    def detect_landmarks(self, frame):
+        """
+        Summary:
+            detect the landmakrs of the hand by using Mediapipe
+
+        Args:
+            frame: np.ndarray
+            
+        Return:
+            None
+        """
+        
         h,w,_ = frame.shape
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
@@ -57,6 +122,18 @@ class HandManager:
             self.reset_hand()
     
     def get_gun_pos_dir(self):
+        """
+        Summary:
+            Calculate the center point of point 8 and point 12.
+            Then direction from pt11 to pt12
+
+        Args:
+            None
+            
+        Return:
+            None
+        """
+        
         pt8 = self.landmarks[8]
         pt11 = self.landmarks[11]
         pt12 = self.landmarks[12]
@@ -66,6 +143,17 @@ class HandManager:
         direction = (pt12[0] - pt11[0], pt12[1] - pt11[1])
         return center_point, direction
     def get_index_finger_polygon(self):
+        """
+        Summary:
+            Get the index finger around points 6,7, and 8
+
+        Args:
+            None
+            
+        Return:
+            None
+        """
+        
         pts = self.landmarks
         if len(pts) > 0:
             return Polygon([pts[8],pts[7],pts[6]])
@@ -74,6 +162,20 @@ class HandManager:
         return self.processed_sequence
     
     def process_world_points(self):
+        """
+        Summary:
+            Pre-process the wolrd points for the LSTM model. It basically normalize
+            and make the point 0 as origion. Also it calculate the difference between
+            current and previous to account for velocity
+
+        Args:
+            None
+            
+        Return:
+            None
+        """
+        
+        
         wpts = self.world_landmarks
         if len(wpts) > 0:
             wrist = wpts[0]
@@ -92,19 +194,61 @@ class HandManager:
             # Reset prev_frame so delta calculation starts fresh when hand re-appears
             self.prev_frame = []
     def reset_gun(self):
+        """
+        Summary:
+            Basically to reset the gun skill
+
+        Args:
+            None
+            
+        Return:
+            None
+        """
         if self.gun is not None:
             self.gun.update_status(EStatus.DYING)
             self.gun = None
             self.gun_counter = -1
     def reset_hand(self):
+        """
+        Summary:
+            Reset the hand counter and polygon
+
+        Args:
+            None
+            
+        Return:
+            None
+        """
         self.hand_boundary_polygon = None
         self.hand_counter = 0
         
-    def update_skill(self,frame, 
+    def update_skill(self,
+                     frame, 
                      skill_item:Item, 
                      gesture, 
                      tracked_faces,
                      is_open_list_sys):
+        """
+        Summary:
+            To draw and process the skill.
+
+        Args:
+            frame: np.ndarray
+                The frame to draw into
+            skill_item: Item
+                The object for the Item
+            getsture: str
+                The current action
+            tracked_faces: list[list[]]
+                A list of tracked faces
+            is_open_list_sys: bool
+                A flag to indicate whether we are opening any system status or the item list            
+        
+        Return:
+            None
+        """
+        
+        
         self.current_skill = skill_item
         if len(self.landmarks) > 0 and self.main_user.get_mp()>=10\
             and is_open_list_sys == False:
@@ -141,16 +285,6 @@ class HandManager:
                 self.reset_gun()
                 self.draw_glowing_haki_hand(frame)
                 if self.hand_boundary_polygon is not None:
-                    # for face,user in zip(faces,users):
-                    # for face in faces:
-                    #     collide = SAT.check_collide(Polygon(face),
-                    #                                 self.hand_boundary_polygon)
-                    #     if collide:
-                            
-                    #         cv2.fillPoly(frame, [np.array(face, dtype=np.int32)], DAMAGE_COLORS_BGR[self.hand_counter])
-                    #         self.hand_counter = (self.hand_counter + 1) % 6
-                    #         if users.get_hp() > 0:
-                    #             users.update_hp(-skill_item.get_bonus_damage())
                     self.main_user.update_mp(-0.1)
                     for tracked_face in tracked_faces:
                         # [tl,br,id,crop,seg_face,user]
@@ -177,6 +311,18 @@ class HandManager:
             self.reset_hand()
     
     def draw_land_mark(self,frame):
+        """
+        Summary:
+            To draw the landmark
+
+        Args:
+            frame: np.ndarray
+                The frame to draw into
+        Return:
+            None
+        """
+        
+        
         pts = self.landmarks
         for start, end in con.HAND_CONNECTIONS:
             cv2.line(frame, pts[start], pts[end], con.HAND_LINE_COLOR, 2)
@@ -185,79 +331,89 @@ class HandManager:
             
         
     def draw_glowing_haki_hand(self,image):
-            """Applies a glowing dark purple aura to the detected hand."""
-            h, w, c = image.shape
-            # define roi
-            points = np.array(self.landmarks)
-            x_min, y_min = np.min(points, axis=0) - 40
-            x_max, y_max = np.max(points, axis=0) + 40
-            x_min, y_min = max(0, x_min), max(0, y_min)
-            x_max, y_max = min(w, x_max), min(h, y_max)
-            
-            roi_h, roi_w = y_max - y_min, x_max - x_min
-            if roi_h <= 0 or roi_w <= 0: return
-            
-            rel_points = points - [x_min, y_min]
-            roi = image[y_min:y_max, x_min:x_max]
-            # Create a binary mask of the hand (white=hand, black=background)
-            mask_outer = np.zeros_like(roi,dtype=np.uint8)
-            
-            mask_middle = np.zeros_like(roi,dtype=np.uint8)
-            
-            # Fill the polygon defined by the hand landmarks
-    
-            for start, end in con.HAND_CONNECTIONS:
-                cv2.line(mask_outer, rel_points[start], rel_points[end], con.HAKI_OUTER, 3)
-                cv2.line(mask_middle, rel_points[start], rel_points[end], con.HAKI_MIDDLE, 15)
-            poly_points = np.array([rel_points[2],
-                            rel_points[5],
-                            rel_points[9],
-                            rel_points[13],
-                            rel_points[17],
-                            rel_points[0],
-                            rel_points[1],], np.int32)
-            
-                        
-            # Expand the mask to create the area for the aura
-            kernel_outer = np.ones((5, 5), np.uint8)
-            mask_outer = cv2.dilate(mask_outer, kernel_outer, iterations=8)
-            
-            kernel_midle = np.ones((3, 3), np.uint8)
-            mask_middle = cv2.dilate(mask_middle, kernel_midle, iterations=5)
-    
-            # Apply Gaussian blur to create the "soft glow" effect
-            # blur_mask = cv2.GaussianBlur(dilated_mask, AURA_BLUR_KERNEL, 0)
-            
-            # Create a 3-channel BGR image of the desired purple color
-            # Only where the blur_mask is bright will this color appear
-    
-            # Blend the resulting purple aura onto the original image
-            # We use cv2.addWeighted to overlay the glow
-            cv2.addWeighted(mask_middle, 1.0, mask_outer, con.AURA_INTENSITY,0, mask_outer)
-            cv2.GaussianBlur(mask_outer,(5,5),3,mask_outer)
-            for start, end in con.HAND_CONNECTIONS:
-                cv2.line(mask_outer, rel_points[start], rel_points[end], con.HAKI_CORE, 10)
-            cv2.fillPoly(mask_outer, [poly_points], con.HAKI_CORE)
-            gray_mask = cv2.cvtColor(mask_outer, cv2.COLOR_BGR2GRAY)
-            _, binary_mask = cv2.threshold(gray_mask, 50, 255, cv2.THRESH_BINARY)
-            
-            alpha = binary_mask / 255
-            alpha = alpha[:, :, np.newaxis]
-            roi[:,:] = (1-alpha) * roi + alpha * mask_outer
-            
-            ## --------Contour----
-            # we will determine the boundaries of the haki hand by using the countours
-            contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            contour = contours[0]
-            # we know that there only one hand in the image so we flatter countours to acommodate noise
-            # contour = np.concatenate(contours, axis=0)
-            # our contour could be anything, we would like to have a convexhull of it
-            # convexhull or contours is something like [[[1,2]],[[2,3]]] which is (N,1,2)
-            # sequeze remove that extra 1
-            hand_boundary = np.squeeze(cv2.convexHull(contour))
-            # convert back to regularn
-            hand_boundary = hand_boundary + [x_min, y_min]
-            self.hand_boundary_polygon = Polygon(hand_boundary)
+        """
+        Summary:
+            Applies a glowing dark purple aura to the detected hand.
+
+        Args:
+            image: np.ndarray
+                The frame to draw into
+        Return:
+            None
+        """
+        
+        h, w, c = image.shape
+        # define roi
+        points = np.array(self.landmarks)
+        x_min, y_min = np.min(points, axis=0) - 40
+        x_max, y_max = np.max(points, axis=0) + 40
+        x_min, y_min = max(0, x_min), max(0, y_min)
+        x_max, y_max = min(w, x_max), min(h, y_max)
+        
+        roi_h, roi_w = y_max - y_min, x_max - x_min
+        if roi_h <= 0 or roi_w <= 0: return
+        
+        rel_points = points - [x_min, y_min]
+        roi = image[y_min:y_max, x_min:x_max]
+        # Create a binary mask of the hand (white=hand, black=background)
+        mask_outer = np.zeros_like(roi,dtype=np.uint8)
+        
+        mask_middle = np.zeros_like(roi,dtype=np.uint8)
+        
+        # Fill the polygon defined by the hand landmarks
+
+        for start, end in con.HAND_CONNECTIONS:
+            cv2.line(mask_outer, rel_points[start], rel_points[end], con.HAKI_OUTER, 3)
+            cv2.line(mask_middle, rel_points[start], rel_points[end], con.HAKI_MIDDLE, 15)
+        poly_points = np.array([rel_points[2],
+                        rel_points[5],
+                        rel_points[9],
+                        rel_points[13],
+                        rel_points[17],
+                        rel_points[0],
+                        rel_points[1],], np.int32)
+        
+                    
+        # Expand the mask to create the area for the aura
+        kernel_outer = np.ones((5, 5), np.uint8)
+        mask_outer = cv2.dilate(mask_outer, kernel_outer, iterations=8)
+        
+        kernel_midle = np.ones((3, 3), np.uint8)
+        mask_middle = cv2.dilate(mask_middle, kernel_midle, iterations=5)
+
+        # Apply Gaussian blur to create the "soft glow" effect
+        # blur_mask = cv2.GaussianBlur(dilated_mask, AURA_BLUR_KERNEL, 0)
+        
+        # Create a 3-channel BGR image of the desired purple color
+        # Only where the blur_mask is bright will this color appear
+
+        # Blend the resulting purple aura onto the original image
+        # We use cv2.addWeighted to overlay the glow
+        cv2.addWeighted(mask_middle, 1.0, mask_outer, con.AURA_INTENSITY,0, mask_outer)
+        cv2.GaussianBlur(mask_outer,(5,5),3,mask_outer)
+        for start, end in con.HAND_CONNECTIONS:
+            cv2.line(mask_outer, rel_points[start], rel_points[end], con.HAKI_CORE, 10)
+        cv2.fillPoly(mask_outer, [poly_points], con.HAKI_CORE)
+        gray_mask = cv2.cvtColor(mask_outer, cv2.COLOR_BGR2GRAY)
+        _, binary_mask = cv2.threshold(gray_mask, 50, 255, cv2.THRESH_BINARY)
+        
+        alpha = binary_mask / 255
+        alpha = alpha[:, :, np.newaxis]
+        roi[:,:] = (1-alpha) * roi + alpha * mask_outer
+        
+        ## --------Contour----
+        # we will determine the boundaries of the haki hand by using the countours
+        contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        contour = contours[0]
+        # we know that there only one hand in the image so we flatter countours to acommodate noise
+        # contour = np.concatenate(contours, axis=0)
+        # our contour could be anything, we would like to have a convexhull of it
+        # convexhull or contours is something like [[[1,2]],[[2,3]]] which is (N,1,2)
+        # sequeze remove that extra 1
+        hand_boundary = np.squeeze(cv2.convexHull(contour))
+        # convert back to regularn
+        hand_boundary = hand_boundary + [x_min, y_min]
+        self.hand_boundary_polygon = Polygon(hand_boundary)
          
             
            

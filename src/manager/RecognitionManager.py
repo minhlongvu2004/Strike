@@ -1,3 +1,15 @@
+"""
+Filename: RecognitionManager.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script is recognizing faces
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 from os import listdir
 
 import cv2
@@ -8,6 +20,23 @@ from sklearn.svm import SVC
 from src.other import constants as con
 
 class RecognitionManager:
+    """
+    Summary:
+        This class is for recognizing faces
+
+    Fields:
+        facenet_model: FaceNet
+            The main facenet model that extract features into embedding
+        normalizer: Normalizer
+            The object to normalize the embedding
+        label_encoder: LabelEncoder
+            The object to convert to categorical label into numerical form for AI model
+        svm_model: SVC
+            This is our classifier
+    Methods:
+        recognize_users
+        load_dataset_faces
+    """
     def __init__(self,
                  identity_dir):
         self.facenet_model = FaceNet()
@@ -26,6 +55,21 @@ class RecognitionManager:
         self.svm_model.fit(X,Y)
     
     def recognize_users(self, faces, ids):
+        """
+        Summary
+
+        Args:
+            faces: List[np.ndarray]
+                List of faces
+            ids: List[int]
+                List of id
+
+        Returns:
+            recognized_faces: List[int,str]
+                List of user id and user name
+        """
+        
+        
         recognized_faces = []
 
         embbeddings = self.facenet_model.embeddings(faces)
@@ -44,6 +88,21 @@ class RecognitionManager:
         return recognized_faces
         
     def load_dataset_faces(self,directory):
+        """
+        Summary:
+            load the dataset that store identities for the user
+
+        Args:
+            directory: str
+                The path to the identity directory
+
+        Returns:
+            faces: List[np.ndarray]
+                List of faces
+            names: str
+                List of names
+        """
+        
         faces = list()
         names = list()
         for filename in listdir(directory):

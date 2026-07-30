@@ -1,9 +1,35 @@
-import numpy as np
+"""
+Filename: TrackerManager.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script is for tracking faces
+"""
 
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
+import numpy as np
 from src.utils import Sort, iou_batch
 from .UserManager import UserManager
 
 class TrackerManager:
+    """
+    Summary:
+        This class is for tracking using SORT
+        
+    Fields:
+        tracker: Sort
+            The SORT model for tracking faces based on bounding box
+        user_manager: UserManager
+            the object for managing user. 
+        
+    Methods:
+        reassociate_ids_faces
+        track_detections
+    """
+    
     
     def __init__(self, 
                  max_age,
@@ -15,6 +41,32 @@ class TrackerManager:
         
         
     def reassociate_ids_faces(self,tracked_ids,detections,crops, face_segments):
+        
+        """
+        Summary:
+            This function is to reassociate the id with the segment faces. We need to do this
+            because tracker only receive bounding box and confidence score and return bbox together
+            with id. The return list could even less than origional so basically we loose all the information.
+            Thus This function use IoU which measure overlap between tracked bbox and origional bbox and take the 
+            largest one. They are not the same due to Kalman filter
+
+        Args:
+            track_ids: List[int,int,int,int,int]
+                list of tracked faces in the format [x'1,y'1,x'2,y'2,id]
+            detections: List[int,int,int,int,conf]
+                List of origional faces in the format [x'1,y'1,x'2,y'2,sface] 
+            crops: List[np.ndarray]
+                List of cropped face image. intended to send to recognition
+            face_segments: List[List[tuple[int,int]]]
+                List of face segment. Face segment is the list of vertices for polygon
+        Returns:
+            ids_faces: List[int,int,int,np.ndarray,List[List[tuple[int,int]]], User]
+                The return is the list of id, face and its metatdata in the format
+                [top_left,bottom_right, id,crops,segment, user]
+        """
+        
+        
+        
         # bboxs is in format of [x1,y1,x2,y2,id]
         # sfaces is in format [x1,y1,x2,y2,sface] where 
         # x'1 is being noised by the Kalma filter. it might be
@@ -82,6 +134,24 @@ class TrackerManager:
         
 
     def track_detections(self, detections):
+        
+        """
+        Summary:
+            Track the bounding boxes.
+        Args:
+            detections: List[int,int,int,int,int]
+                List of bounding box in the format 
+                [x_top_left,y_top_left,x_bottom_right,y_bottom_right,confidence]
+
+        Returns:
+            track_id: List[int,int,int,int,int]
+                Those ids are registered in user manager and 
+                return in the format [x1,y1,x2,y2,id]
+            untrack_id: List[int,int,int,int,int]
+                Those ids are not registered in user manager and 
+                return in the format [x1,y1,x2,y2,id]
+        """
+        
         # [x1,y1,x2,y2,conf]
         # 
         # detection should be in the format [x1,y1,x2,y2,conf] where conf might be in scale of 100
