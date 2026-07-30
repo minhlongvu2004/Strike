@@ -9,14 +9,14 @@ FULL_MP = 100
 FULL_LEVEL = 999
 FULL_EXP = 100
 FULL_ATTACK = 999
-MAIN_USER_NAME = "Greedy Dreamer"
+MAIN_USER_NAME = "Vu Minh Long"
 
 # ==========================================
 # 2. UI & Styling (Colors)
 # ==========================================
 # HUD Bar Colors
-MP_OUTER_COLOR = (255, 31, 0)
-MP_INNER_COLOR = (255, 150, 150)
+MP_OUTER_COLOR =(220, 170, 0) #(255, 31, 0)
+MP_INNER_COLOR = (255, 255, 170)#(255, 150, 150)
 HP_OUTER_COLOR = (0, 31, 255)
 HP_INNER_COLOR = (150, 150, 255)
 EXP_OUTER_COLOR = (0, 150, 0)
@@ -45,7 +45,7 @@ BD_SELECTED_RECTANGLE = (255, 0, 255)
 DEATH_OUTER_COLOR = (20, 20, 200)
 DEATH_INNER_COLOR = (180, 180, 255)
 DEATH_BG = (63, 63, 154)
-HAKI_CORE = (10, 10, 10)
+HAKI_CORE = (70, 70, 70)
 HAKI_MIDDLE = (140, 0, 120)
 HAKI_OUTER = (255, 100, 255)
 
@@ -54,7 +54,7 @@ HAKI_OUTER = (255, 100, 255)
 # ==========================================
 OTHER_BAR_LENGTH = 50
 OTHER_BAR_THICK = 5
-MAIN_EXP_BAR = (620, 350)
+MAIN_EXP_BAR = (600, 350)
 MAIN_HUD_TOP_LEFT = (480, 10)
 MAIN_HOR_BAR_LENGTH = 80
 MAIN_HOR_BAR_THICK = 5
@@ -118,7 +118,7 @@ LSTM_WEIGHT_FILE = "./weights/action.h5"
 # ==========================================
 GUN_STEP = 10
 GUN_NAME = "gun"
-GUN_DAMAGE = 6
+GUN_DAMAGE = 3
 GUN_IMAGE_LINK = "./assets/item/ball.png"
 EXPLODE_PROJECTILE = "./assets/item/explode.png"
 
@@ -127,7 +127,7 @@ KATANA_DAMAGE = 4
 KATANA_IMAGE_LINK = "./assets/item/katana.png"
 
 HAND_NAME = "hand"
-HAND_DAMAGE = 1
+HAND_DAMAGE = 10
 HAND_IMAGE_LINK = "./assets/item/hand.png"
 
 POTION_NAME = "potion"

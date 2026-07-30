@@ -100,9 +100,14 @@ class HandManager:
         self.hand_boundary_polygon = None
         self.hand_counter = 0
         
-    def update_skill(self,frame, skill_item:Item, gesture, tracked_faces):
+    def update_skill(self,frame, 
+                     skill_item:Item, 
+                     gesture, 
+                     tracked_faces,
+                     is_open_list_sys):
         self.current_skill = skill_item
-        if len(self.landmarks) > 0 and self.main_user.get_mp()>=10:
+        if len(self.landmarks) > 0 and self.main_user.get_mp()>=10\
+            and is_open_list_sys == False:
             if self.current_skill.get_name() == "gun" :
                 if gesture == "gun_pose":
         
@@ -178,69 +183,83 @@ class HandManager:
         for x, y in pts:
             cv2.circle(frame, (x, y), con.HAND_POINT_SCALE, con.HAND_POINT_COLOR, -1)
             
+        
     def draw_glowing_haki_hand(self,image):
-        """Applies a glowing dark purple aura to the detected hand."""
-        h, w, c = image.shape
-        
-        # Create a binary mask of the hand (white=hand, black=background)
-        mask_outer = np.zeros((h, w,3), dtype=np.uint8)
-        mask_middle = np.zeros((h, w,3), dtype=np.uint8)
-        points = self.landmarks
-        # Fill the polygon defined by the hand landmarks
-
-        for start, end in con.HAND_CONNECTIONS:
-            cv2.line(mask_outer, points[start], points[end], con.HAKI_OUTER, 3)
-            cv2.line(mask_middle, points[start], points[end], con.HAKI_MIDDLE, 15)
-        poly_points = np.array([points[2],
-                        points[5],
-                        points[9],
-                        points[13],
-                        points[17],
-                        points[0],
-                        points[1],], np.int32)
-        
-                    
-        # Expand the mask to create the area for the aura
-        kernel_outer = np.ones((5, 5), np.uint8)
-        mask_outer = cv2.dilate(mask_outer, kernel_outer, iterations=8)
-        
-        kernel_midle = np.ones((3, 3), np.uint8)
-        mask_middle = cv2.dilate(mask_middle, kernel_midle, iterations=5)
-
-        # Apply Gaussian blur to create the "soft glow" effect
-        # blur_mask = cv2.GaussianBlur(dilated_mask, AURA_BLUR_KERNEL, 0)
-        
-        # Create a 3-channel BGR image of the desired purple color
-        # Only where the blur_mask is bright will this color appear
-
-        # Blend the resulting purple aura onto the original image
-        # We use cv2.addWeighted to overlay the glow
-        cv2.addWeighted(mask_middle, 1.0, mask_outer, con.AURA_INTENSITY,0, mask_outer)
-        cv2.GaussianBlur(mask_outer,(5,5),3,mask_outer)
-        for start, end in con.HAND_CONNECTIONS:
-            cv2.line(mask_outer, points[start], points[end], con.HAKI_CORE, 10)
-        cv2.fillPoly(mask_outer, [poly_points], con.HAKI_CORE)
-        gray_mask = cv2.cvtColor(mask_outer, cv2.COLOR_BGR2GRAY)
-        _, binary_mask = cv2.threshold(gray_mask, 1, 255, cv2.THRESH_BINARY)
-        
-        mask = cv2.cvtColor(binary_mask, cv2.COLOR_GRAY2BGR)
-        # we will determine the boundaries of the haki hand by using the countours
-        contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        # we know that there only one hand in the image so we flatter countours to acommodate noise
-        contour = np.concatenate(contours, axis=0)
-        # our contour could be anything, we would like to have a convexhull of it
-        # convexhull or contours is something like [[[1,2]],[[2,3]]] which is (N,1,2)
-        # sequeze remove that extra 1
-        hand_boundary = np.squeeze(cv2.convexHull(contour))
-        self.hand_boundary_polygon = Polygon(hand_boundary)
-       
-        
-        inverse_hand_mask = cv2.bitwise_not(mask)
-        
-        
-        image_no_hand = cv2.bitwise_and(image, inverse_hand_mask)
-  
-        image[:,:] = cv2.add(image_no_hand, mask_outer)
-        # result = cv2.addWeighted(image, 1.0, mask_outer, AURA_INTENSITY, 0,image)
-    
+            """Applies a glowing dark purple aura to the detected hand."""
+            h, w, c = image.shape
+            # define roi
+            points = np.array(self.landmarks)
+            x_min, y_min = np.min(points, axis=0) - 40
+            x_max, y_max = np.max(points, axis=0) + 40
+            x_min, y_min = max(0, x_min), max(0, y_min)
+            x_max, y_max = min(w, x_max), min(h, y_max)
             
+            roi_h, roi_w = y_max - y_min, x_max - x_min
+            if roi_h <= 0 or roi_w <= 0: return
+            
+            rel_points = points - [x_min, y_min]
+            roi = image[y_min:y_max, x_min:x_max]
+            # Create a binary mask of the hand (white=hand, black=background)
+            mask_outer = np.zeros_like(roi,dtype=np.uint8)
+            
+            mask_middle = np.zeros_like(roi,dtype=np.uint8)
+            
+            # Fill the polygon defined by the hand landmarks
+    
+            for start, end in con.HAND_CONNECTIONS:
+                cv2.line(mask_outer, rel_points[start], rel_points[end], con.HAKI_OUTER, 3)
+                cv2.line(mask_middle, rel_points[start], rel_points[end], con.HAKI_MIDDLE, 15)
+            poly_points = np.array([rel_points[2],
+                            rel_points[5],
+                            rel_points[9],
+                            rel_points[13],
+                            rel_points[17],
+                            rel_points[0],
+                            rel_points[1],], np.int32)
+            
+                        
+            # Expand the mask to create the area for the aura
+            kernel_outer = np.ones((5, 5), np.uint8)
+            mask_outer = cv2.dilate(mask_outer, kernel_outer, iterations=8)
+            
+            kernel_midle = np.ones((3, 3), np.uint8)
+            mask_middle = cv2.dilate(mask_middle, kernel_midle, iterations=5)
+    
+            # Apply Gaussian blur to create the "soft glow" effect
+            # blur_mask = cv2.GaussianBlur(dilated_mask, AURA_BLUR_KERNEL, 0)
+            
+            # Create a 3-channel BGR image of the desired purple color
+            # Only where the blur_mask is bright will this color appear
+    
+            # Blend the resulting purple aura onto the original image
+            # We use cv2.addWeighted to overlay the glow
+            cv2.addWeighted(mask_middle, 1.0, mask_outer, con.AURA_INTENSITY,0, mask_outer)
+            cv2.GaussianBlur(mask_outer,(5,5),3,mask_outer)
+            for start, end in con.HAND_CONNECTIONS:
+                cv2.line(mask_outer, rel_points[start], rel_points[end], con.HAKI_CORE, 10)
+            cv2.fillPoly(mask_outer, [poly_points], con.HAKI_CORE)
+            gray_mask = cv2.cvtColor(mask_outer, cv2.COLOR_BGR2GRAY)
+            _, binary_mask = cv2.threshold(gray_mask, 50, 255, cv2.THRESH_BINARY)
+            
+            alpha = binary_mask / 255
+            alpha = alpha[:, :, np.newaxis]
+            roi[:,:] = (1-alpha) * roi + alpha * mask_outer
+            
+            ## --------Contour----
+            # we will determine the boundaries of the haki hand by using the countours
+            contours, _ = cv2.findContours(binary_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            contour = contours[0]
+            # we know that there only one hand in the image so we flatter countours to acommodate noise
+            # contour = np.concatenate(contours, axis=0)
+            # our contour could be anything, we would like to have a convexhull of it
+            # convexhull or contours is something like [[[1,2]],[[2,3]]] which is (N,1,2)
+            # sequeze remove that extra 1
+            hand_boundary = np.squeeze(cv2.convexHull(contour))
+            # convert back to regularn
+            hand_boundary = hand_boundary + [x_min, y_min]
+            self.hand_boundary_polygon = Polygon(hand_boundary)
+         
+            
+           
+
+        

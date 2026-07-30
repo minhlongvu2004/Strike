@@ -44,7 +44,7 @@ def FaceRecognitionThread(recognition_manager: RecognitionManager,
             recognize_users = recognition_manager.recognize_users(faces,ids)
             user_manager.register_users(recognize_users)
         
-def MainThread(frame_queue:queue.Queue,
+def SELUThread(frame_queue:queue.Queue,
                read_queue: queue.Queue,
                recognition_queue: queue.Queue,
                yolo_manager: YOLOManager,
@@ -82,6 +82,9 @@ def MainThread(frame_queue:queue.Queue,
         hud_manager.check_if_click_item_hud(current_pose,index_polygon)
         hud_manager.check_if_select_items_list(current_pose,index_polygon)
         current_skill_item = hud_manager.get_item()
+        is_open_list = hud_manager.is_open_item_list()
+        is_open_system_status = hud_manager.is_open_system_status()
+        is_open_list_system = is_open_list or is_open_system_status
         # detect collision
         
         
@@ -91,7 +94,11 @@ def MainThread(frame_queue:queue.Queue,
         hud_manager.draw_system_status_hud(frame)
         hud_manager.draw_sel_list(frame)
         # 
-        hand_manager.update_skill(frame, current_skill_item, current_pose,tracked_faces)
+        hand_manager.update_skill(frame, 
+                                  current_skill_item, 
+                                  current_pose,
+                                  tracked_faces,
+                                  is_open_list_system)
         
         
         projectile_manager.update(frame.shape, tracked_faces)
@@ -107,12 +114,12 @@ def MainThread(frame_queue:queue.Queue,
 
 def main():
     main_user = User(con.MAIN_USER_NAME,
-            con.FULL_HP // 3,
+            con.FULL_HP,
              con.FULL_MP,
              con.FULL_EXP // 2,
              con.FULL_ATTACK,
              ERole.MAIN_USER,
-             con.FULL_LEVEL,
+             1,
             "True Dragon, Dream Creator, Greedy Dreamer",
             "Hand Of Death, World of Dreamers")
     gun = Item(con.GUN_NAME, 
@@ -132,14 +139,15 @@ def main():
                   con.POTION_IMAGE_LINK, 
                   con.LIST_ITEM__SIZE)
     item_list = ItemList(con.TOP_LEFT_ITEMS_LIST,
-                         gun, 
-                         hand, 
                          katana, 
-                         potion,EItem.First)
+                         potion,
+                         gun, 
+                        hand, 
+                         EItem.First)
     
     
     
-    obama = User("Barrack Obama",
+    obama = User("Barack Obama",
                  con.FULL_HP,
                  con.FULL_MP,
                  con.FULL_EXP,
@@ -159,14 +167,14 @@ def main():
                 con.FULL_EXP,
                 0,
                 ERole.OTHER_USER, 
-                99)
+                999)
     ishowspeed = User("ishowspeed",
                       con.FULL_HP,
                       con.FULL_MP,
                       con.FULL_EXP,
                       0,
                       ERole.OTHER_USER, 
-                      99)
+                      999)
     long = User("Minh Long Vu",
                 con.FULL_HP,
                 con.FULL_MP,
@@ -179,7 +187,7 @@ def main():
                 con.FULL_MP,
                 con.FULL_EXP,
                 0,
-                ERole.OTHER_USER,99)
+                ERole.OTHER_USER,999)
 
     user_manager = UserManager([obama,
                                 trump,
@@ -235,7 +243,7 @@ def main():
     capture_worker = threading.Thread(target = FrameCaptureThread,
                                     args=(frame_queue,),
                                     daemon=True)
-    main_worker = threading.Thread(target = MainThread,
+    main_worker = threading.Thread(target = SELUThread,
                                     args=(frame_queue,
                                           ready_queue,
                                           recognition_queue,
@@ -272,8 +280,8 @@ def main():
             last_time = end
         if len(time_buffer) == 20:
             moving_average = len(time_buffer)/ sum(time_buffer)
-            cv2.putText(ready_frame,f"FPS: {moving_average:.0f}",(50,50),cv2.FONT_HERSHEY_COMPLEX,1,(123,123,123),1)
-        cv2.imshow("SRE Strike", ready_frame)
+            cv2.putText(ready_frame,f"FPS: {moving_average:.0f}",(10,10),cv2.FONT_HERSHEY_COMPLEX,0.4,(123,123,123),1)
+        cv2.imshow("SREL Strike", ready_frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
