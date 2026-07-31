@@ -1,5 +1,5 @@
 """
-Filename: UserManager.py
+Filename: YOLOManager.py
 Author: Minh Long Vu
 Date: 2026-07-30
 Description: This script is for running the YOLO
