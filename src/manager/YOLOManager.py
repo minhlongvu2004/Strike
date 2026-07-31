@@ -1,15 +1,46 @@
+"""
+Filename: YOLOManager.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script is for running the YOLO
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 import math
 
 import cv2
 from ultralytics import YOLO
 
 class YOLOManager:
+    """
+    Summary:
+        The class is used to manage the user. The main focus is the register user where we replace
+        the corresponding id based on user name
+        
+    Fields:
+        segment_model: YOLO
+            the YOLO segment model 
+        detections: List[int,int,int,int,int]
+            List of segment detection in the format [x1,y1,x2,y2,conf]
+        face_segments: List[List[tuple[int,int]]]
+            The list of face segment. Each face segment is the list of vertices of face polygon
+        crop_faces: List[np.ndarray]
+            The list of cropped face image
+        
+    Methods:
+        get_detections_crops_segments
+        detect_faces
+    """   
     def __init__(self, model_path):
         self.segment_model = YOLO(model_path)
         self.segment_model.to('cuda')
         self.detections = []
         self.face_segments = []
-        self.crop_face = []
+        self.crop_faces = []
         
     def get_detections_crops_segments(self):
         return self.detections, self.crop_faces, self.face_segments

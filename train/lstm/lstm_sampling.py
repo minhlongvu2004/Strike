@@ -1,7 +1,14 @@
-'''
-This file scrip is insteded to take the samples for training the LSTM
+"""
+Filename: lstm_sampling.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This file scrip is insteded to take the samples for training the LSTM
+"""
 
-'''
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
 
 
 import cv2

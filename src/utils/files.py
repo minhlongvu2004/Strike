@@ -1,3 +1,15 @@
+"""
+Filename: files.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script perform operations related to file such as re-index or split train,val,test...
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 import os
 from os import listdir
 import shutil
@@ -5,19 +17,23 @@ from sklearn.model_selection import train_test_split
 
 
 def index_files(src_dir, dest_dir, start = 1, step = 1):
-    
-    '''
-    index_files: this file simply rename all the files in a folder based on the index integer
-    
-    src_dir: source directory
-    dest_dir: destination directory
-    start: where the number of index start
-    step: how should the value of next index is
-    
-    return: don't return 
-    '''
-    
-    
+    """
+    Summary:
+        this function simply rename all the files in a folder based on the index integer
+
+    Args:
+        src_dir: str
+            The source directory of files
+        dest_dir: str
+            The destination directory of files
+        start: int, optional, default to 1
+            The start of reindex files
+        step: int,optional, default to 1
+            The step for reindex. Example 1,2,3 for step 1 or 1,3,5 for step 2
+            
+    Return:
+        None
+    """
     
     src_files = list()
     for file in listdir(src_dir):
@@ -39,17 +55,27 @@ def index_files(src_dir, dest_dir, start = 1, step = 1):
 
 
 def split_data(images_dir,labels_dir, percent_val=0.15,percent_test=0.15):
+    """
+    Summary:
+        This split the data into train, val, and test folders. Each contain images and labels folders
+        It assume that the label files has the same name as images files Example: img1.jpg and img1.txt
+
+    Args:
+        images_src: str
+            the source of the images
+        labels_src: str
+            the source of the labels
+        percent_val: float, optional, default to 0.15
+            the percentage of validation part
+        percent_test: float, optional, default to 0.15
+            the percentage of test part
+            
+    Return:
+        list[str],list[str],list[str],list[str],list[str],list[str]:
+            3 images and 3 labels subsets for train, val, and test, respectively
+    """
     
-    '''
-    This split the data into train, val, and test folders. Each contain images and labels folders
-    It assume that the label files has the same name as images files Example: img1.jpg and img1.txt
-    images_src: the source of the images
-    labels_src: the source of the labels
-    percent_train: the percentarge of the train part
-    percent_val: the percentage of validation part
-    percent_test: the percentage of test part
-    return: 3 images and 3 labels subsets for train, val, and test, respectively
-    '''
+    
     images = list()
     labels = list()
     for img in listdir(images_dir):
@@ -98,14 +124,21 @@ def split_data(images_dir,labels_dir, percent_val=0.15,percent_test=0.15):
 
 def copy_files_to_dest(src_dir, dest_dir, src_files):
     
-    '''
-    copy_files_to_dest: copy selected files in a directory to a location
-    src_dir: the source directory contains all the files
-    dest_dir: the destination directory
-    src_files: the selected files in that directory 
-    return: no return
-    '''
-    
+    """
+    Summary:
+        copy selected files in a directory to a locatio
+
+    Args:
+        src_dir: str
+            the source directory contains all the files
+        dest_dir: str
+            the destination directory
+        src_files: list[str] 
+            the selected files in that directory 
+            
+    Return:
+        None
+    """
     
     # there might be mess up between jpg and png 
     os.makedirs(os.path.dirname(dest_dir), exist_ok=True)
@@ -119,16 +152,27 @@ def copy_images_labels_to_dest(images_dir,
                                dest, 
                                percent_val = 0.15,
                                percent_test = 0.15):
-    
-    '''
-    copy_images_labels_to_dest: this application will split the data into the YOLO format
-    where it include train,val, and test inside data directory. Each train,val,and test itself contains
-    images and labels folders
-    images_dir: the path to the images folder
-    labels_dir: the path to the labels folder
-    dest: the destination where we put the YOLO formated daata
-    return: no return
-    '''
+    """
+    Summary:
+    this application will split the data into the train format
+    where it include train,val, and test inside data directory. 
+    Each train,val,and test itself contains images and labels folders
+
+    Args:
+        images_dir: str
+            the path to the images folder
+        labels_dir: str
+            the path to the labels folder
+        dest: str
+            the destination where we put the YOLO formated daata
+        percent_val: float, optional, default to 0.15
+            the percentage of validation part
+        percent_test: float, optional, default to 0.15
+            the percentage of test part
+            
+    Return:
+        None
+    """
     
     
     train_images, val_images, test_images, train_labels, val_labels, test_labels\

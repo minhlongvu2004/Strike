@@ -1,3 +1,15 @@
+"""
+Filename: ItemDraw.py
+Author: Minh Long Vu
+Date: 2026-07-30
+Description: This script is an extension of Item Object
+"""
+
+__author__ = "Minh Long Vu"
+__license__ = "GPL"
+__email__ = "minhlongvu626@gmail.com"
+__status__ = "Prototype"
+
 import numpy as np
 import cv2
 from .Item import Item
